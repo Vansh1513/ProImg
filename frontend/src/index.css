@@ -8,6 +8,7 @@
 }
 
 .common-btn{
-    @apply w-full py-2 px-4 bg-red-600 hover:bg-red-800 text-white font-semibold rounded-md shadow-md focus:outline-none
-    focus:ring-2 focus:ring-offset-2 focus:ring-red-500
+    background-color: #3a9659;
+    @apply w-full py-2 px-4 hover:bg-green-700 text-white font-semibold rounded-md shadow-md focus:outline-none
+    focus:ring-2 focus:ring-offset-2 focus:ring-green-700
 }

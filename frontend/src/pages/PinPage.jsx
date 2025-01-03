@@ -55,10 +55,15 @@ const PinPage = ({ user }) => {
     fetchPin(params.id);
   }, [params.id]);
 
+  const style2 = {
+    backgroundColor: '#3D3D3D', // Hex color for background
+    
+  };
+
   return (
     <div>
       {pin && (
-        <div className="flex flex-col items-center bg-gray-100 p-4 min-h-screen">
+        <div className="flex flex-col items-center  p-4 min-h-screen" style={style2}>
           {loading ? (
             <Loading />
           ) : (
@@ -68,7 +73,7 @@ const PinPage = ({ user }) => {
                   <img
                     src={pin.image.url}
                     alt=""
-                    className="object-cover w-full rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                    className="object-contain w-full rounded-t-lg md:rounded-l-lg md:rounded-t-none"
                   />
                 )}
               </div>
@@ -118,7 +123,7 @@ const PinPage = ({ user }) => {
                 {edit && (
                   <button
                     style={{ width: "200px" }}
-                    className="bg-red-500 text-white py-1 px-3 mt-2 mb-2"
+                    className="bg-green-500 text-white py-1 px-3 mt-2 mb-2"
                     onClick={updateHandler}
                   >
                     Update
@@ -166,7 +171,7 @@ const PinPage = ({ user }) => {
 
                     <button
                       type="submit"
-                      className="ml-2 bg-red-500 px-4 py-2 rounded-md text-white"
+                      className="ml-2 bg-green-500 px-4 py-2 rounded-md text-white"
                     >
                       Add+
                     </button>

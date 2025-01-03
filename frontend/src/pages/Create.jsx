@@ -40,12 +40,17 @@ const Create = () => {
     formData.append("file", file);
 
     addPin(formData, setFilePrev, setFile, setTitle, setPin, navigate);
+
+    const style2 = {
+      backgroundColor: '#3D3D3D', // Hex color for background
+      
+    };
   };
   return (
-    <div>
-      <div className="flex flex-wrap justify-center items-center gap-2 mt-10">
+    <div className="h-screen " >
+      <div className="flex flex-wrap justify-center items-center gap-2 mt-10"   >
         <div className="flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center w-80 h-auto p-6 bg-white rounded-lg shadow-lg">
+          <div className="flex flex-col items-center justify-center w-80 h-auto p-6 bg-white rounded-lg shadow-lg" >
             {filePrev && <img src={filePrev} alt="" />}
             <div
               className="flex flex-col items-center justify-center h-full cursor-pointer"

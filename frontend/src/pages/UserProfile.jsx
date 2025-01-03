@@ -42,27 +42,34 @@ const UserProfile = ({ user: loggedInUser }) => {
     userPins = pins.filter((pin) => pin.owner === user._id);
   }
 
+
   useEffect(() => {
     fetchUser();
   }, []);
+
+  const style2 = {
+    backgroundColor: '#3D3D3D', // Hex color for background
+    
+  };
+
   return (
-    <div>
+    <div style={style2}>
       {user && (
         <div className="flex flex-col items-center justify-center">
           <div className="p-6 w-full">
             <div className="flex items-center justify-center">
               <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
                 {user.name && (
-                  <span className="text-3xl text-gray-700">
-                    {user.name.slice(0, 1)}
+                  <span className="text-3xl text-white">
+                    {user.name.slice(0, 1).toUpperCase()}
                   </span>
                 )}
               </div>
             </div>
 
             <h1 className="text-center text-2xl font-bold mt-4">{user.name}</h1>
-            <p className="text-center text-gray-600 mt-2">{user.email}</p>
-            <p className="flex justify-center items-center text-center gap-3 text-gray-600 mt-2">
+            <p className="text-center text-white mt-2">{user.email}</p>
+            <p className="flex justify-center items-center text-center gap-3 text-green-600 mt-2">
               {user.followers && <p>{user.followers.length} followers</p>}
               {user.following && <p>{user.following.length} followings</p>}
             </p>

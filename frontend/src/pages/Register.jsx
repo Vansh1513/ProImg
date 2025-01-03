@@ -3,6 +3,8 @@ import { UserData } from '../context/UserContext'
 import { useNavigate } from 'react-router-dom'
 import { LoadingAnimation } from '../components/Loading'
 import { PinData } from '../context/PinContext'
+import myimage from '../assets/pra.png'
+
 
 const Register = () => {
 
@@ -17,27 +19,48 @@ const Register = () => {
   const submitHandler=(e)=>{
           e.preventDefault();
           registerUser(name,email,password,navigate);
-          
-  
+
+
       }
+
+
+      
+    const style = {
+        backgroundColor: '#1A1A1D', // Hex color for background
+        
+      };
+    
+    const style2 = {
+        backgroundColor: '#4C585B', // Hex color for background
+        
+      };
+
+      const styl1 = {
+        color : '#50c878', // Hex color for background
+        
+      };
+   
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-200 '>
-          <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-md'>
-            <div className='flex justify-center mb-4'>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Pinterest-logo.png/600px-Pinterest-logo.png" alt="" className='h-12' />
-            </div>
-            <h2 className='text-2xl font-semibold text-center mb-6'>REGISTER</h2>
+    <div className='min-h-screen flex items-center justify-center bg-black '>
+          <div className='p-6 rounded-lg shadow-lg w-full max-w-md '  style={style}>
+                
+                  <div className='flex justify-center '>
+                      <img src={myimage} alt="" className='h-20' />
+                  </div>
+                  <h2 className='text-xl font-semibold  text-center mb-2' style={styl1}>PROIMG</h2>
+          
+                  <h2 className='text-2xl font-semibold text-white text-center mb-2'>REGISTER</h2>
             <form onSubmit={submitHandler} >
             <div className='mb-4'>
-                    <label htmlFor="name" className='block text-sm font-medium text-gray-700' >NAME</label>
+                    <label htmlFor="name" className='block text-sm font-medium text-white' >NAME</label>
                     <input value={name} onChange={(e)=>setName(e.target.value)} required type="name" id='name' className='common-input' />
                 </div>
                 <div className='mb-4'>
-                    <label htmlFor="email" className='block text-sm font-medium text-gray-700' >EMAIL</label>
+                    <label htmlFor="email" className='block text-sm font-medium text-white' >EMAIL</label>
                     <input value={email} onChange={(e)=>setEmail(e.target.value)} required type="email" id='email' className='common-input' />
                 </div>
                 <div className='mb-4'>
-                    <label htmlFor="password" className='block text-sm font-medium text-gray-700'>PASSWORD</label>
+                    <label htmlFor="password" className='block text-sm font-medium text-white'>PASSWORD</label>
                     <input value={password} onChange={(e)=>setPassword(e.target.value)} required type="password" id='password' className='common-input' />
                 </div>
                 <button type='submit' className='common-btn'disabled={btnLoading}> {btnLoading?<LoadingAnimation/>:"Register"} </button>
@@ -48,11 +71,11 @@ const Register = () => {
                         <div className='w-full border-t border-gray-300'></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className='bg-white px-2 to-gray-500'>OR</span>
+                        <span className='bg-white px-2 to-gray-500'></span>
                     </div>
                 </div>
                 <div>
-                    <h2>Already't have an Account ?</h2><a href="/login" className=' underline text-blue-500 '>Login</a>
+                    <h2 className='text-white'>Already't have an Account ?</h2><a href="/login" className=' hover:underline text-blue-500 '>Login</a>
                 </div>
                 {/* <div className='mt-4 text-center text-sm'>
                     <span>
