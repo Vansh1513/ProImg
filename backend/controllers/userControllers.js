@@ -83,19 +83,20 @@ export const forgetPassword=TryCatch(async(req,res)=>{
             pass:process.env.MY_PASS,
         }
     })
-    
-    const token1 = jwt.sign({email},process.env.JWT_SEC,{
-        expiresIn : "1h"
+    let id =user._id;
+    const token = jwt.sign({id},process.env.JWT_SEC,{
+        expiresIn : "3h"
     })
     const receiver ={
         from :" ppc@gmail.com",
         to:email,
         subject :"Reset Your Password",
-        text : `Click link to reset password ${process.env.CLIENT_URL}/reset-password${token1}`
+        text : `Click link to reset password ${process.env.CLIENT_URL}/reset-password/${token}`
     }
 
     await transporter.sendMail(receiver);
     res.status(200).json({
+        token,
         message:"Email sent",
     })
 
@@ -103,20 +104,23 @@ export const forgetPassword=TryCatch(async(req,res)=>{
 })
 
 export const resetPassword = TryCatch(async(req,res)=>{
-    const {token1} = req.params;
+    
+    const {email} = req.body;
+    const {token} = req.params;
     const {password} =req.body;
     if (!password) return res.status(400).json({
         message:"NO PASSWORD",
     })
 
-    const decode = jwt.verify(token1,process.env.JWT_SEC)
+    const decode = jwt.verify(token,process.env.JWT_SEC)
+    // console.log(token)wheb
 
-    const user = await User.findOne({email:decode.email})
+    const user = await User.findOne({email})
     const newpass = await bcrypt.hash(password, 10);
     user.password=newpass;
     await user.save()
     res.json({
-        
+        token ,
         message:" reset successfull",
 
     })

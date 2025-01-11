@@ -70,7 +70,7 @@ const UserProfile = ({ user: loggedInUser }) => {
             <h1 className="text-center text-2xl font-bold mt-4">{user.name}</h1>
             <p className="text-center text-white mt-2">{user.email}</p>
             <p className="flex justify-center items-center text-center gap-3 text-green-600 mt-2">
-              {user.followers && <p>{user.followers.length} followers</p>}
+              {user.followers && <p>{isFollow ? user.followers.length+1 : user.followers.length} followers</p>}
               {user.following && <p>{user.following.length} followings</p>}
             </p>
             {user && user._id === loggedInUser._id ? (

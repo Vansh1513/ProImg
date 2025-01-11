@@ -9,15 +9,19 @@ import PinPage from "./pages/PinPage";
 import Create from "./pages/Create";
 import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
+import Forgot from "./pages/Forgot";
+import Reset from "./pages/Reset";
 
 const App = () => {
-  const { loading, isAuth, user } = UserData();
+  const { loading, isAuth, user,forgotUser,resetUser,} = UserData(); // Access context data for loading and authentication status
+  console.log(isAuth);
   return (
     <>
       {loading ? (
-        <Loading />
+        <Loading /> // Show loading animation while user data is being fetched
       ) : (
         <BrowserRouter>
+          
           {isAuth && <Navbar user={user} />}
           <Routes>
             <Route path="/" element={isAuth ? <Home /> : <Login />} />
@@ -39,6 +43,15 @@ const App = () => {
               path="/register"
               element={isAuth ? <Home /> : <Register />}
             />
+            <Route
+              path="/forgot"
+              element={!isAuth ? <Forgot /> : <Home />} // Show Forgot page if not authenticated
+            />
+            <Route
+              path="/reset-password/:token"
+              element={<Reset />}
+            />
+           
           </Routes>
         </BrowserRouter>
       )}

@@ -38,7 +38,7 @@ const Account = ({ user }) => {
 
   
   return (
-    <div style={style2}>
+    <div >
       <div className="flex flex-col items-center justify-center">
         <div className="p-6 w-full">
           <div className="flex items-center justify-center">

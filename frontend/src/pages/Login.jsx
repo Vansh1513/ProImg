@@ -71,6 +71,7 @@ const Login = () => {
                 </div>
             </div>
             <div>
+                <a href="/forgot" className='hover:underline text-blue-500 '>FORGOT PASSWORD ?</a>
                 <h2 className='text-white'>Don't have Account ?</h2><a href="/register" className='hover:underline text-blue-500 '>Register</a>
             </div>
             {/* <div className='mt-4 text-center text-sm'>

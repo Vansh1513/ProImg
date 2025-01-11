@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
+import { UserData } from "./UserContext";
 import toast from "react-hot-toast";
 
 const PinContext = createContext();
@@ -7,6 +8,7 @@ const PinContext = createContext();
 export const PinProvider = ({ children }) => {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { isAuth } = UserData();
 
   async function fetchPins() {
     try {
@@ -108,7 +110,7 @@ export const PinProvider = ({ children }) => {
 
   useEffect(() => {
     fetchPins();
-  }, []);
+  }, [isAuth]);
   return (
     <PinContext.Provider
       value={{
