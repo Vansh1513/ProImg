@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import myimage from "../assets/pra.png";
 
 const Reset = () => {
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("");
   const { resetUser, btnLoading } = UserData();
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Reset = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    resetUser(token, password, navigate); // Call reset function with token and password
+    resetUser(token, email,password, navigate); // Call reset function with token and password
   };
 
   return (
@@ -28,6 +29,19 @@ const Reset = () => {
           RESET PASSWORD
         </h2>
         <form onSubmit={submitHandler}>
+        <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-white">
+              Email
+            </label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              type="email"
+              id="email"
+              className="common-input"
+            />
+          </div>
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-white">
               New Password
