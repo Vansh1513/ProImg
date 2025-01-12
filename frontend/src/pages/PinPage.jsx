@@ -61,7 +61,7 @@ const PinPage = ({ user }) => {
   };
 
   return (
-    <div>
+    <div >
       {pin && (
         <div className="flex flex-col items-center  p-4 min-h-screen" >
           {loading ? (
