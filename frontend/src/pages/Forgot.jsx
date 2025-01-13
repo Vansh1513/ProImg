@@ -12,7 +12,9 @@ const Forgot = ({ user }) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    forgotUser(email, navigate ); // Call forgotUser function when form is submitted
+    forgotUser(email, navigate );
+    
+     // Call forgotUser functiseon when form is submitted
   };
 
   const style = {

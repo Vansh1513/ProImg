@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import toast  from 'react-hot-toast';
 
 const UserContext = createContext(); // Create a context
 
@@ -21,7 +21,7 @@ export const UserProvider = ({ children }) => {
       navigate("/");
       fetchPins();
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      toast.error(error.response.data.message);
       setBtnLoading(false);
     }
   }
