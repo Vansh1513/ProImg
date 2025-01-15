@@ -44,7 +44,7 @@ export const loginUser=TryCatch(async(req,res)=>{
     const user=await User.findOne({email});
     if(!user){
         return res.status(400).json({
-            message:"No user found",
+            message:"Email or Password Incorrect.",
         });
     }
     const comaparePassword=await bcrypt.compare(password,user.password);
@@ -52,7 +52,7 @@ export const loginUser=TryCatch(async(req,res)=>{
 
     if(!comaparePassword){
         return res.status(400).json({
-            message:"Incorrect Password",
+            message:"Email or Password Incorrect.",
         });
 
     }
