@@ -11,6 +11,13 @@ dotenv.config();
 
 export const registerUser=TryCatch(async (req, res) => {
     const { name, email, password } = req.body;
+    
+    if(Array.isArray(email)){
+        return res.status(400).json({
+            message:"Only one email is allowed",
+        })
+    }
+    
   
     let user = await User.findOne({ email });
   
@@ -70,10 +77,10 @@ export const loginUser=TryCatch(async(req,res)=>{
 export const forgetPassword=TryCatch(async(req,res)=>{
     const {email} =req.body;
 
-    if(Array.isArray(email)){
+    if (Array.isArray(email) || !validator.isEmail(email)) {
         return res.status(400).json({
-            message:"Only one email is allowed",
-        })
+            message: "Invalid email format",
+        });
     }
     const user= await User.findOne({email})
     if(!user)
