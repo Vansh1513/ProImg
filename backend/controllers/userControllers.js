@@ -69,6 +69,12 @@ export const loginUser=TryCatch(async(req,res)=>{
 
 export const forgetPassword=TryCatch(async(req,res)=>{
     const {email} =req.body;
+
+    if(Array.isArray(email)){
+        return res.status(400).json({
+            message:"Only one email is allowed",
+        })
+    }
     const user= await User.findOne({email})
     if(!user)
         return res.status(400).json({
