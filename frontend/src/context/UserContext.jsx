@@ -46,10 +46,10 @@ export const UserProvider = ({ children }) => {
   }
 
   // Function to reset password
-  async function resetUser(token, email, password,navigate) {
+  async function resetUser(token, password,navigate) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post("/api/user/reset-password/" + token, { email, password });
+      const { data } = await axios.post("/api/user/reset-password/" + token, { password });
       toast.success(data.message);
       // setUser(data.user);
       setBtnLoading(false);

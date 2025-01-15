@@ -27,7 +27,7 @@ export const registerUser=TryCatch(async (req, res) => {
       password: hashPassword,
     });
 
-    generateToken(user._id,res);
+    generateToken(user,res);
 
     res.status(201).json({
         user,
@@ -56,7 +56,7 @@ export const loginUser=TryCatch(async(req,res)=>{
         });
 
     }
-    generateToken(user._id,res);
+    generateToken(user,res);
 
 
     res.json({
@@ -83,8 +83,8 @@ export const forgetPassword=TryCatch(async(req,res)=>{
             pass:process.env.MY_PASS,
         }
     })
-    let id =user._id;
-    const token = jwt.sign({id},process.env.JWT_SEC,{
+    
+    const token = jwt.sign({email: user.email},process.env.JWT_SEC,{
         expiresIn : "3h"
     })
     const receiver ={
@@ -96,16 +96,14 @@ export const forgetPassword=TryCatch(async(req,res)=>{
 
     await transporter.sendMail(receiver);
     res.status(200).json({
-        token,
+        
         message:"Email sent",
     })
-
-
 })
 
 export const resetPassword = TryCatch(async(req,res)=>{
     
-    const {email} = req.body;
+    // const {email} = req.body;
     const {token} = req.params;
     const {password} =req.body;
     if (!password) return res.status(400).json({
@@ -115,12 +113,12 @@ export const resetPassword = TryCatch(async(req,res)=>{
     const decode = jwt.verify(token,process.env.JWT_SEC)
     // console.log(token)wheb
 
-    const user = await User.findOne({email})
+    const user = await User.findOne({email:decode.email}); 
     const newpass = await bcrypt.hash(password, 10);
     user.password=newpass;
     await user.save()
     res.json({
-        token ,
+        
         message:" reset successfull",
 
     })
