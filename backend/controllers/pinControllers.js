@@ -70,7 +70,7 @@ export const deleteComment = TryCatch(async (req, res) => {
   
     const commentIndex = pin.comments.findIndex(
       (item) => item._id.toString() === req.query.commentId.toString()
-    );
+    );    
   
     if (commentIndex === -1) {
       return res.status(404).json({

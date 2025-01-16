@@ -14,6 +14,7 @@ cloudinary.v2.config({
 });
 
 const app = express();
+export const OTP_STORE ={};
 
 const port = process.env.PORT;
 

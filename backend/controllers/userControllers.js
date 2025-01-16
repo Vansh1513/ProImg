@@ -2,48 +2,108 @@ import { User } from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
 import TryCatch from "../utils/TryCatch.js";
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
+import { OTP_STORE } from "../index.js";
 
 dotenv.config();
 
 
-export const registerUser=TryCatch(async (req, res) => {
-    const { name, email, password } = req.body;
-    
-    if(Array.isArray(email)){
-        return res.status(400).json({
-            message:"Only one email is allowed",
-        })
-    }
-    
-  
-    let user = await User.findOne({ email });
-  
-    if (user)
-      return res.status(400).json({
-        message: "Already have an account with this email",
-      });
-  
-    const hashPassword = await bcrypt.hash(password, 10);
-  
-    user = await User.create({
-      name,
-      email,
-      password: hashPassword,
+
+ // Temporary storage for unverified users
+const TEMP_USERS = {}; // Use Redis or a database for better scalability
+
+export const registerWithOtp = TryCatch(async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (Array.isArray(email)) {
+    return res.status(400).json({
+      message: "Only one email is allowed",
+    });
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({
+      message: "An account with this email already exists",
+    });
+  }
+
+  const otp = crypto.randomInt(100000, 999999); // Generate OTP
+  TEMP_USERS[email] = {
+    name,
+    password,
+    otp,
+    expiresAt: Date.now() + 5 * 60 * 1000, // OTP valid for 5 minutes
+  };
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    secure: true,
+    auth: {
+      user: process.env.MY_GMAIL,
+      pass: process.env.MY_PASS,
+    },
+  });
+
+  try {
+    await transporter.sendMail({
+      from: process.env.MY_GMAIL,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is: ${otp}`,
     });
 
-    generateToken(user,res);
-
-    res.status(201).json({
-        user,
-        message:"user registered",
+    res.status(200).json({
+      message: "OTP sent successfully. Please verify to complete registration.",
     });
-
-    
-
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).send("Failed to send OTP");
+  }
 });
+
+export const verifyOtpAndRegister = TryCatch(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  const tempUser = TEMP_USERS[email];
+  if (!tempUser) {
+    return res.status(400).json({ message: "No OTP request found for this email" });
+  }
+
+  if (tempUser.expiresAt < Date.now()) {
+    delete TEMP_USERS[email];
+    return res.status(400).json({ message: "OTP expired" });
+  }
+
+  if (parseInt(tempUser.otp) !== parseInt(otp)) {
+    return res.status(400).json({ message: "Invalid OTP" });
+  }
+
+  // OTP verified - Create user
+  const hashPassword = await bcrypt.hash(tempUser.password, 10);
+  const user = await User.create({
+    name: tempUser.name,
+    email,
+    password: hashPassword,
+  });
+
+  delete TEMP_USERS[email]; // Remove temporary data after successful registration
+
+  generateToken(user, res);
+
+  res.status(201).json({
+    user,
+    message: "User registered successfully",
+  });
+});
+
 
 
 export const loginUser=TryCatch(async(req,res)=>{

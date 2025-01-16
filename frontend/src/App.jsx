@@ -11,6 +11,7 @@ import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
 import Forgot from "./pages/Forgot";
 import Reset from "./pages/Reset";
+import OtpVerify from "./pages/OtpVerify";
 
 const App = () => {
   const { loading, isAuth, user,forgotUser,resetUser,} = UserData(); // Access context data for loading and authentication status
@@ -39,9 +40,10 @@ const App = () => {
               element={isAuth ? <PinPage user={user} /> : <Login />}
             />
             <Route path="/login" element={isAuth ? <Home /> : <Login />} />
+            <Route path="/verify" element={isAuth ? <Home /> : <OtpVerify/>} />
             <Route
               path="/register"
-              element={isAuth ? <Home /> : <Register />}
+              element={ <Register />}
             />
             <Route
               path="/forgot"

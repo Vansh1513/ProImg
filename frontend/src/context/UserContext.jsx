@@ -61,10 +61,24 @@ export const UserProvider = ({ children }) => {
   }
 
   // Function to register new user
-  async function registerUser(name, email, password, navigate, fetchPins) {
+  async function registerUser(name, email, password, navigate) {
     setBtnLoading(true);
     try {
       const { data } = await axios.post("/api/user/register", { name, email, password });
+      toast.success(data.message);
+      setBtnLoading(false);
+      navigate("/verify");
+      
+    } catch (error) {
+      toast.error(error.response.data.message);
+      setBtnLoading(false);
+    }
+  }
+
+  async function verify(email, otp,navigate, fetchPins) {
+    setBtnLoading(true);
+    try {
+      const { data } = await axios.post("/api/user/verifyOtp", { email, otp });
       toast.success(data.message);
       setUser(data.user);
       setIsAuth(true);
@@ -122,6 +136,7 @@ export const UserProvider = ({ children }) => {
         followUser,
         forgotUser, // Make sure forgotUser is exposed here
         resetUser,
+        verify,
       }}
     >
       {children}
