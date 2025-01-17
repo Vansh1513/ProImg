@@ -7,7 +7,7 @@ import myimage from "../assets/pra.png";
 
 const OtpVerify = () => {
   // const [email, setEmail] = useState("")
-  const [email, setEmail] = useState("")
+
   const [otp, setOtp] = useState("");
   const { verify, btnLoading } = UserData();
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const OtpVerify = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    verify(email,otp, navigate); // Call reset function with token and password
+    verify(token,otp, navigate); // Call reset function with token and password
   };
 
   return (
@@ -30,20 +30,6 @@ const OtpVerify = () => {
           ENTER OTP
         </h2>
         <form onSubmit={submitHandler}>
-        <div className="mb-4">
-            <label htmlFor="password" className="block text-sm font-medium text-white">
-              EMAIL
-            </label>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              type="email"
-              id="email"
-              className="common-input"
-            />
-          </div>
-        
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-white">
               OTP

@@ -66,8 +66,9 @@ export const UserProvider = ({ children }) => {
     try {
       const { data } = await axios.post("/api/user/register", { name, email, password });
       toast.success(data.message);
+      const token=data.token
       setBtnLoading(false);
-      navigate("/verify");
+      navigate("/verify/"+token);
       
     } catch (error) {
       toast.error(error.response.data.message);
@@ -75,10 +76,10 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  async function verify(email, otp,navigate, fetchPins) {
+  async function verify(token, otp,navigate, fetchPins) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post("/api/user/verifyOtp", { email, otp });
+      const { data } = await axios.post("/api/user/verifyOtp/"+token, {otp });
       toast.success(data.message);
       setUser(data.user);
       setIsAuth(true);

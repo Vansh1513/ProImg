@@ -3,6 +3,13 @@ import { FaPlus } from "react-icons/fa";
 import { PinData } from "../context/PinContext";
 import { useNavigate } from "react-router-dom";
 
+const LoadingAnimation = () => (
+  <div className="flex justify-center items-center">
+    <div className="spinner border-t-transparent border-4 border-green-500 rounded-full w-6 h-6 animate-spin"></div>
+  </div>
+);
+
+
 const Create = () => {
   const inputRef = useRef(null);
 
@@ -14,6 +21,7 @@ const Create = () => {
   const [filePrev, setFilePrev] = useState("");
   const [title, setTitle] = useState("");
   const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false); // Added loading state
   const { addPin } = PinData();
 
   const changeFileHandler = (e) => {
@@ -30,28 +38,31 @@ const Create = () => {
 
   const navigate = useNavigate();
 
-  const addPinHandler = (e) => {
+  const addPinHandler = async (e) => {
     e.preventDefault();
 
+    setLoading(true); // Start loading
     const formData = new FormData();
 
     formData.append("title", title);
     formData.append("pin", pin);
     formData.append("file", file);
 
-    addPin(formData, setFilePrev, setFile, setTitle, setPin, navigate);
-
-    const style2 = {
-      backgroundColor: '#3D3D3D', // Hex color for background
-      
-    };
+    try {
+      await addPin(formData, setFilePrev, setFile, setTitle, setPin, navigate);
+    } catch (error) {
+      console.error("Failed to add pin:", error);
+    } finally {
+      setLoading(false); // Stop loading after process completion
+    }
   };
+
   return (
-    <div className="h-screen " >
-      <div className="flex flex-wrap justify-center items-center gap-2 mt-10"   >
+    <div className="h-screen">
+      <div className="flex flex-wrap justify-center items-center gap-2 mt-10">
         <div className="flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center w-80 h-auto p-6 bg-white rounded-lg shadow-lg" >
-            {filePrev && <img src={filePrev} alt="" />}
+          <div className="flex flex-col items-center justify-center w-80 h-auto p-6 bg-white rounded-lg shadow-lg">
+            {filePrev && <img src={filePrev} alt="Preview" />}
             <div
               className="flex flex-col items-center justify-center h-full cursor-pointer"
               onClick={handleClick}
@@ -69,7 +80,7 @@ const Create = () => {
               <p className="text-gray-500">Choose a file</p>
             </div>
             <p className="mt-4 text-sm text-gray-400">
-              we recomment using high quality .jpg files but less than 10mb
+              We recommend using high-quality .jpg files but less than 10MB
             </p>
           </div>
         </div>
@@ -112,7 +123,13 @@ const Create = () => {
                   required
                 />
               </div>
-              <button className="common-btn">Add+</button>
+              <button
+                type="submit"
+                className={`common-btn ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={loading}
+              >
+                {loading ? <LoadingAnimation /> : "Create"}
+              </button>
             </form>
           </div>
         </div>

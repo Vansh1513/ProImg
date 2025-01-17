@@ -6,7 +6,7 @@ const router=express.Router();
 
 router.post("/register",registerWithOtp);
 // router.post("/getOtp",otpGenerator);
-router.post("/verifyOtp",verifyOtpAndRegister);
+router.post("/verifyOtp/:token",verifyOtpAndRegister);
 router.post("/login",loginUser);
 router.post("/forget",forgetPassword);
 router.post("/reset-password/:token",resetPassword);

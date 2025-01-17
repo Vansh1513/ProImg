@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
-import { OTP_STORE } from "../index.js";
+
 
 dotenv.config();
 
@@ -56,8 +56,11 @@ export const registerWithOtp = TryCatch(async (req, res) => {
       text: `Your OTP is: ${otp}`,
     });
 
+    const token = jwt.sign({ email }, process.env.JWT_SEC, { expiresIn: "5m" });
+
     res.status(200).json({
       message: "OTP sent successfully. Please verify to complete registration.",
+      token,
     });
   } catch (error) {
     console.error("Error sending OTP:", error);
@@ -66,43 +69,52 @@ export const registerWithOtp = TryCatch(async (req, res) => {
 });
 
 export const verifyOtpAndRegister = TryCatch(async (req, res) => {
-  const { email, otp } = req.body;
+  const { otp } = req.body;
+  const { token}=req.params;
 
-  if (!email || !otp) {
-    return res.status(400).json({ message: "Email and OTP are required" });
+  if (!otp || !token) {
+    return res.status(400).json({ message: "OTP and token are required" });
   }
 
-  const tempUser = TEMP_USERS[email];
-  if (!tempUser) {
-    return res.status(400).json({ message: "No OTP request found for this email" });
+  try {
+    const { email } = jwt.verify(token, process.env.JWT_SEC);
+
+    const tempUser = TEMP_USERS[email];
+    if (!tempUser) {
+      return res.status(400).json({ message: "No OTP request found for this email" });
+    }
+
+    if (tempUser.expiresAt < Date.now()) {
+      delete TEMP_USERS[email];
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    if (parseInt(tempUser.otp) !== parseInt(otp)) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+   
+    const hashPassword = await bcrypt.hash(tempUser.password, 10);
+    const user = await User.create({
+      name: tempUser.name,
+      email,
+      password: hashPassword,
+    });
+
+    delete TEMP_USERS[email]; //
+
+    generateToken(user, res);
+
+    res.status(201).json({
+      user,
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(400).json({ message: "Invalid or expired token" });
   }
-
-  if (tempUser.expiresAt < Date.now()) {
-    delete TEMP_USERS[email];
-    return res.status(400).json({ message: "OTP expired" });
-  }
-
-  if (parseInt(tempUser.otp) !== parseInt(otp)) {
-    return res.status(400).json({ message: "Invalid OTP" });
-  }
-
-  // OTP verified - Create user
-  const hashPassword = await bcrypt.hash(tempUser.password, 10);
-  const user = await User.create({
-    name: tempUser.name,
-    email,
-    password: hashPassword,
-  });
-
-  delete TEMP_USERS[email]; // Remove temporary data after successful registration
-
-  generateToken(user, res);
-
-  res.status(201).json({
-    user,
-    message: "User registered successfully",
-  });
 });
+
 
 
 

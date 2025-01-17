@@ -40,7 +40,7 @@ const App = () => {
               element={isAuth ? <PinPage user={user} /> : <Login />}
             />
             <Route path="/login" element={isAuth ? <Home /> : <Login />} />
-            <Route path="/verify" element={isAuth ? <Home /> : <OtpVerify/>} />
+            <Route path="/verify/:token" element={isAuth ? <Home /> : <OtpVerify/>} />
             <Route
               path="/register"
               element={ <Register />}
