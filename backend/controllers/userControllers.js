@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
+import validator from 'validator';
 
 
 dotenv.config();
@@ -18,9 +19,10 @@ const TEMP_USERS = {}; // Use Redis or a database for better scalability
 export const registerWithOtp = TryCatch(async (req, res) => {
   const { name, email, password } = req.body;
 
-  if (Array.isArray(email)) {
+   
+   if (Array.isArray(email) || !validator.isEmail(email)) {
     return res.status(400).json({
-      message: "Only one email is allowed",
+      message: "Invalid email format",
     });
   }
 
@@ -149,11 +151,12 @@ export const loginUser=TryCatch(async(req,res)=>{
 export const forgetPassword=TryCatch(async(req,res)=>{
     const {email} =req.body;
 
-    if (Array.isArray(email)) {
-        return res.status(400).json({
-            message: "Invalid email format",
-        });
-    }
+     
+  if (Array.isArray(email) || !validator.isEmail(email)) {
+    return res.status(400).json({
+      message: "Invalid email format",
+    });
+  }
     const user= await User.findOne({email})
     if(!user)
         return res.status(400).json({
