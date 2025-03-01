@@ -8,7 +8,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchPins();
-  }, [fetchPins]);
+  }, []);
 
   // Loading component
   const Loading = () => (
