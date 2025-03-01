@@ -1,49 +1,46 @@
 import React, { useRef, useState } from "react";
-import { FaPlus } from "react-icons/fa";
-import { PinData } from "../context/PinContext";
 import { useNavigate } from "react-router-dom";
-
-const LoadingAnimation = () => (
-  <div className="flex justify-center items-center">
-    <div className="spinner border-t-transparent border-4 border-green-500 rounded-full w-6 h-6 animate-spin"></div>
-  </div>
-);
-
+import { Upload, Image as ImageIcon, X, Loader } from "lucide-react";
+import { PinData } from "../context/PinContext";
 
 const Create = () => {
   const inputRef = useRef(null);
+  const [file, setFile] = useState("");
+  const [filePrev, setFilePrev] = useState("");
+  const [title, setTitle] = useState("");
+  const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { addPin } = PinData();
+  const navigate = useNavigate();
 
   const handleClick = () => {
     inputRef.current.click();
   };
 
-  const [file, setFile] = useState("");
-  const [filePrev, setFilePrev] = useState("");
-  const [title, setTitle] = useState("");
-  const [pin, setPin] = useState("");
-  const [loading, setLoading] = useState(false); // Added loading state
-  const { addPin } = PinData();
-
   const changeFileHandler = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+    
     const reader = new FileReader();
-
     reader.readAsDataURL(file);
-
     reader.onloadend = () => {
       setFilePrev(reader.result);
       setFile(file);
     };
   };
 
-  const navigate = useNavigate();
+  const removeImage = () => {
+    setFilePrev("");
+    setFile("");
+  };
 
   const addPinHandler = async (e) => {
     e.preventDefault();
 
-    setLoading(true); // Start loading
-    const formData = new FormData();
+    if (!file || !title || !pin) return;
 
+    setLoading(true);
+    const formData = new FormData();
     formData.append("title", title);
     formData.append("pin", pin);
     formData.append("file", file);
@@ -53,82 +50,112 @@ const Create = () => {
     } catch (error) {
       console.error("Failed to add pin:", error);
     } finally {
-      setLoading(false); // Stop loading after process completion
+      setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen">
-      <div className="flex flex-wrap justify-center items-center gap-2 mt-10">
-        <div className="flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center w-80 h-auto p-6 bg-white rounded-lg shadow-lg">
-            {filePrev && <img src={filePrev} alt="Preview" />}
-            <div
-              className="flex flex-col items-center justify-center h-full cursor-pointer"
-              onClick={handleClick}
-            >
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={changeFileHandler}
-              />
-              <div className="w-12 h-12 mb-4 flex items-center justify-center bg-gray-200 rounded-full">
-                <FaPlus />
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8  bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Create New Pin</h1>
+        
+        <div className="flex flex-col lg:flex-row gap-8 justify-center">
+          {/* Image Upload Section */}
+          <div className="w-full lg:w-1/2 bg-white rounded-xl shadow-md overflow-hidden">
+            {filePrev ? (
+              <div className="relative">
+                <img 
+                  src={filePrev} 
+                  alt="Preview" 
+                  className="w-full h-auto max-h-[500px] object-contain bg-gray-100" 
+                />
+                <button 
+                  onClick={removeImage}
+                  className="absolute top-4 right-4 p-2 bg-gray-800 bg-opacity-70 rounded-full text-white hover:bg-opacity-90 transition"
+                >
+                  <X size={20} />
+                </button>
               </div>
-              <p className="text-gray-500">Choose a file</p>
-            </div>
-            <p className="mt-4 text-sm text-gray-400">
-              We recommend using high-quality .jpg files but less than 10MB
-            </p>
+            ) : (
+              <div 
+                className="flex flex-col items-center justify-center h-96 p-6 cursor-pointer bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                onClick={handleClick}
+              >
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={changeFileHandler}
+                />
+                <div className="w-16 h-16 mb-4 flex items-center justify-center bg-emerald-100 text-emerald-600 rounded-full">
+                  <Upload size={24} />
+                </div>
+                <p className="text-gray-700 font-medium mb-2">Upload an image</p>
+                <p className="text-sm text-gray-500 text-center max-w-sm">
+                  Choose a high-quality JPG image (max 10MB) for the best experience
+                </p>
+              </div>
+            )}
           </div>
-        </div>
 
-        <div>
-          <div className="flex items-center justify-center bg-gray-100">
-            <form
-              className="w-full max-w-lg p-6 bg-white rounded-lg shadow-lg"
+          {/* Form Section */}
+          <div className="w-full lg:w-1/2">
+            <form 
+              className="bg-white p-8 rounded-xl shadow-md"
               onSubmit={addPinHandler}
             >
-              <div className="mb-4">
+              <div className="mb-6">
                 <label
                   htmlFor="title"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   Title
                 </label>
                 <input
                   type="text"
                   id="title"
-                  className="common-input"
+                  placeholder="Add a title that describes your pin"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
-              <div className="mb-4">
+              
+              <div className="mb-8">
                 <label
                   htmlFor="pin"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Pin
+                  Description
                 </label>
-                <input
-                  type="text"
+                <textarea
                   id="pin"
-                  className="common-input"
+                  rows="4"
+                  placeholder="Tell everyone what your pin is about"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   required
                 />
               </div>
+              
               <button
                 type="submit"
-                className={`common-btn ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={loading}
+                className={`w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow transition ${
+                  loading || !file ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={loading || !file}
               >
-                {loading ? <LoadingAnimation /> : "Create"}
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <Loader size={20} className="animate-spin mr-2" />
+                    <span>Creating...</span>
+                  </div>
+                ) : (
+                  "Create Pin"
+                )}
               </button>
             </form>
           </div>

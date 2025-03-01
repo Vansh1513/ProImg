@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { PinData } from "../context/PinContext";
-import { Loading } from "../components/Loading";
-import { MdDelete } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { 
+  Trash2, Edit, Send, UserCircle, Heart, 
+  Download, Share2, Clock, MessageSquare, AlertCircle 
+} from "lucide-react";
 
 const PinPage = ({ user }) => {
   const params = useParams();
-
+  const navigate = useNavigate();
+  
+  // Get pin-related functions from context
   const {
     loading,
     fetchPin,
@@ -18,210 +21,376 @@ const PinPage = ({ user }) => {
     deletePin,
   } = PinData();
 
+  // Component state
   const [edit, setEdit] = useState(false);
   const [title, setTitle] = useState("");
   const [pinValue, setPinValue] = useState("");
+  const [comment, setComment] = useState("");
+  const [error, setError] = useState(null);
 
+  // Check for valid user
+  if (!user || !user._id) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh]">
+        <AlertCircle size={32} className="mb-4 text-yellow-500" />
+        <p className="text-gray-700 font-medium">Please log in to view pin details</p>
+        <button 
+          onClick={() => navigate('/login')}
+          className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
+
+  // Fetch pin data when component mounts or ID changes
+  useEffect(() => {
+    if (params.id) {
+      setError(null);
+      fetchPin(params.id).catch(err => 
+        setError(err?.message || "Failed to load pin details")
+      );
+    }
+  }, [params.id]); // Removed fetchPin from dependencies
+
+  // Update local state when pin data changes
+  useEffect(() => {
+    if (pin) {
+      setTitle(pin.title || "");
+      setPinValue(pin.pin || "");
+    }
+  }, [pin]);
+
+  // Handler functions
   const editHandler = () => {
-    setTitle(pin.title);
-    setPinValue(pin.pin);
     setEdit(!edit);
   };
 
   const updateHandler = () => {
-    updatePin(pin._id, title, pinValue, setEdit);
+    if (!title.trim()) {
+      setError("Title cannot be empty");
+      return;
+    }
+    
+    try {
+      updatePin(pin._id, title, pinValue, setEdit);
+    } catch (err) {
+      setError(err?.message || "Failed to update pin");
+    }
   };
-
-  const [comment, setComment] = useState("");
 
   const submitHandler = (e) => {
     e.preventDefault();
-    addComment(pin._id, comment, setComment);
+    if (comment.trim()) {
+      try {
+        addComment(pin._id, comment, setComment);
+      } catch (err) {
+        setError(err?.message || "Failed to add comment");
+      }
+    }
   };
 
-  const deleteCommentHander = (id) => {
-    if (confirm("Are you sure you want to delete this comment"))
-      deleteComment(pin._id, id);
+  const deleteCommentHandler = (id) => {
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      try {
+        deleteComment(pin._id, id);
+      } catch (err) {
+        setError(err?.message || "Failed to delete comment");
+      }
+    }
   };
-
-  const navigate = useNavigate();
 
   const deletePinHandler = () => {
-    if (confirm("Are you sure you want to delete this pin"))
-      deletePin(pin._id, navigate);
+    if (window.confirm("Are you sure you want to delete this pin?")) {
+      try {
+        deletePin(pin._id, navigate);
+      } catch (err) {
+        setError(err?.message || "Failed to delete pin");
+      }
+    }
   };
 
-  useEffect(() => {
-    fetchPin(params.id);
-  }, [params.id]);
+  // Loading component
+  const Loading = () => (
+    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+      <div className="w-12 h-12 border-4 border-gray-200 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+      <p className="text-gray-600 font-medium">Loading pin details...</p>
+    </div>
+  );
 
-  const style2 = {
-    backgroundColor: '#3D3D3D', // Hex color for background
-    
-  };
+  // Error component
+  const ErrorDisplay = () => (
+    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+      <AlertCircle size={32} className="mb-4 text-red-500" />
+      <p className="text-red-600 font-medium">{error}</p>
+      <button 
+        onClick={() => window.location.reload()}
+        className="mt-4 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+      >
+        Try Again
+      </button>
+    </div>
+  );
+
+  // Show loading state
+  if (loading) {
+    return <Loading />;
+  }
+
+  // Show error state
+  if (error) {
+    return <ErrorDisplay />;
+  }
+
+  // Show error if pin data is missing
+  if (!pin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh]">
+        <AlertCircle size={32} className="mb-4 text-yellow-500" />
+        <p className="text-gray-700 font-medium">Pin not found or was deleted</p>
+        <button 
+          onClick={() => navigate('/')}
+          className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg"
+        >
+          Go Home
+        </button>
+      </div>
+    );
+  }
+
+  // Safely check if current user is the pin owner
+  const isOwner = pin.owner && user && pin.owner._id === user._id;
+  
+  // Format date safely
+  const formattedDate = pin.createdAt 
+    ? new Date(pin.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }) 
+    : null;
 
   return (
-    <div >
-      {pin && (
-        <div className="flex flex-col items-center  p-4 min-h-screen" >
-          {loading ? (
-            <Loading />
-          ) : (
-            <div className="bg-white rounded-lg shadow-lg flex flex-wrap w-full max-w-4xl">
-              <div className="w-full md:w-1/2 bg-gray-200 rounded-t-lg md:rounded-l-lg md:rounded-t-none flex items-center justify-center">
-                {pin.image && (
-                  <img
-                    src={pin.image.url}
-                    alt=""
-                    className="object-contain w-full rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                  />
-                )}
-              </div>
-
-              <div className="w-full md:w-1/2 p-6 flex flex-col ">
-                <div className="flex items-center justify-between mb-4 ">
-                  {edit ? (
-                    <input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="common-input"
-                      style={{ width: "200px" }}
-                      placeholder="Enter Title"
-                    />
-                  ) : (
-                    <h1 className="text-2xl font-bold">{pin.title}</h1>
-                  )}
-
-                  {pin.owner && pin.owner._id === user._id && (
-                    <button onClick={editHandler}>
-                      <FaEdit />
-                    </button>
-                  )}
-
-                  {pin.owner && pin.owner._id === user._id && (
-                    <button
-                      onClick={deletePinHandler}
-                      className="bg-red-500 text-white py-1 px-3 rounded"
-                    >
-                      <MdDelete />
-                    </button>
-                  )}
+    <div className=" min-h-screen py-8 px-4 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-sm shadow-lg overflow-hidden">
+          <div className="flex flex-col lg:flex-row">
+            {/* Left side - Image */}
+            <div className="w-full lg:w-3/5 bg-gray-100 relative flex items-center justify-center min-h-[300px]">
+              {pin.image && pin.image.url ? (
+                <img
+                  src={pin.image.url}
+                  alt={pin.title || "Pin image"}
+                  className="w-full h-full object-contain lg:max-h-[80vh]"
+                />
+              ) : (
+                <div className="text-gray-400 flex flex-col items-center">
+                  <AlertCircle size={48} className="mb-2" />
+                  <p>No image available</p>
                 </div>
-
+              )}
+              
+              {/* Image actions overlay */}
+              <div className="absolute top-4 right-4 flex space-x-2">
+                <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition">
+                  <Heart size={20} className="text-gray-700" />
+                </button>
+                <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition">
+                  <Download size={20} className="text-gray-700" />
+                </button>
+                <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition">
+                  <Share2 size={20} className="text-gray-700" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Right side - Content */}
+            <div className="w-full lg:w-2/5 p-6 flex flex-col">
+              {/* Header with edit/delete options */}
+              <div className="flex items-center justify-between mb-4">
                 {edit ? (
                   <input
-                    value={pinValue}
-                    onChange={(e) => setPinValue(e.target.value)}
-                    className="common-input"
-                    style={{ width: "200px" }}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                     placeholder="Enter Title"
                   />
                 ) : (
-                  <p className="mb-6">{pin.pin}</p>
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    {pin.title || "Untitled Pin"}
+                  </h1>
                 )}
-
+                
+                {isOwner && (
+                  <div className="flex space-x-2 ml-4">
+                    <button 
+                      onClick={editHandler}
+                      className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-emerald-600 transition"
+                      title={edit ? "Cancel editing" : "Edit pin"}
+                    >
+                      <Edit size={18} />
+                    </button>
+                    <button
+                      onClick={deletePinHandler}
+                      className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-red-600 transition"
+                      title="Delete pin"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              {/* Description */}
+              <div className="mb-6">
+                {edit ? (
+                  <textarea
+                    value={pinValue}
+                    onChange={(e) => setPinValue(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    rows="4"
+                    placeholder="Enter Description"
+                  />
+                ) : (
+                  <p className="text-gray-700 whitespace-pre-line">
+                    {pin.pin || "No description provided."}
+                  </p>
+                )}
+                
                 {edit && (
                   <button
-                    style={{ width: "200px" }}
-                    className="bg-green-500 text-white py-1 px-3 mt-2 mb-2"
+                    className="mt-3 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow transition"
                     onClick={updateHandler}
                   >
-                    Update
+                    Update Pin
                   </button>
                 )}
-
-                {pin.owner && (
-                  <div className="flex items-center justify-between border-b pb-4 mb-4">
-                    <div className="flex items-center">
-                      <Link to={`/user/${pin.owner._id}`}>
-                        <div className="rounded-full h-12 w-12 bg-gray-300 flex items-center justify-center">
-                          <span className="font-bold">
-                            {pin.owner.name.slice(0, 1)}
-                          </span>
-                        </div>
-                      </Link>
-                      <div className="ml-4">
-                        <h2 className="text-lg font-semibold">
-                          {pin.owner.name}
-                        </h2>
-                        <p className="text-gray-500">
-                          {pin.owner.followers.length} Followers
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+              </div>
+              
+              {/* Date and stats */}
+              <div className="flex items-center text-gray-500 text-sm mb-4">
+                {formattedDate && (
+                  <>
+                    <Clock size={14} className="mr-1" />
+                    <span>{formattedDate}</span>
+                    <div className="mx-2 h-1 w-1 rounded-full bg-gray-300"></div>
+                  </>
                 )}
-
-                <div className="flex items-center mt-4">
-                  <div className="rounded-full h-12 w-12 bg-gray-300 flex items-center justify-center mr-4">
-                    <span className="font-bold">
-                      {pin.owner && pin.owner.name.slice(0, 1)}
-                    </span>
+                <MessageSquare size={14} className="mr-1" />
+                <span>
+                  {pin.comments && Array.isArray(pin.comments) 
+                    ? pin.comments.length 
+                    : 0} comments
+                </span>
+              </div>
+              
+              {/* Creator profile */}
+              {pin.owner && (
+                <div className="flex items-center border-t border-b border-gray-100 py-4 my-4">
+                  <Link to={`/user/${pin.owner._id}`} className="flex items-center">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
+                      {pin.owner.name 
+                        ? pin.owner.name.slice(0, 1).toUpperCase() 
+                        : '?'}
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="font-medium text-gray-800">
+                        {pin.owner.name || "Unknown User"}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {pin.owner.followers && Array.isArray(pin.owner.followers)
+                          ? `${pin.owner.followers.length} followers`
+                          : '0 followers'}
+                      </p>
+                    </div>
+                  </Link>
+                </div>
+              )}
+              
+              {/* Comment form */}
+              <form className="mb-6" onSubmit={submitHandler}>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold mr-3">
+                    {user?.name 
+                      ? user.name.slice(0, 1).toUpperCase() 
+                      : 'U'}
                   </div>
-
-                  <form className="flex-1 flex" onSubmit={submitHandler}>
+                  <div className="flex-1 relative">
                     <input
                       type="text"
-                      placeholder="Enter Comment"
-                      className="flex-1 border rounded-lg p-2"
+                      placeholder="Add a comment..."
+                      className="w-full px-4 py-2 pr-12 rounded-full border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
-                      required
                     />
-
                     <button
                       type="submit"
-                      className="ml-2 bg-green-500 px-4 py-2 rounded-md text-white"
+                      className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center ${
+                        comment.trim() 
+                          ? "text-emerald-600 hover:text-emerald-700" 
+                          : "text-gray-400 cursor-not-allowed"
+                      }`}
+                      disabled={!comment.trim()}
                     >
-                      Add+
+                      <Send size={18} />
                     </button>
-                  </form>
+                  </div>
                 </div>
-
-                <hr className="font-bold text-gray-400 mt-3 mb-3" />
-
-                <div className="overflow-y-auto h-64">
-                  {pin.comments && pin.comments.length > 0 ? (
-                    pin.comments.map((e, i) => (
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center mb-4 justify-center gap-3">
-                          <Link to={`/user/${e.user}`}>
-                            <div className="rounded-full h-12 w-12 bg-gray-300 flex items-center justify-center">
-                              <span className="font-bold">
-                                {e.name.slice(0, 1)}
-                              </span>
-                            </div>
-                          </Link>
-
-                          <div className="ml-4">
-                            <div className="ml-4">
-                              <h2 className="text-lg font-semibold">
-                                {e.name}
-                              </h2>
-                              <p className="text-gray-500">{e.comment}</p>
-                            </div>
+              </form>
+              
+              {/* Comments section */}
+              <div className="overflow-y-auto max-h-80 pr-2">
+                <h3 className="font-medium text-gray-800 mb-4 flex items-center">
+                  <MessageSquare size={18} className="mr-2" />
+                  Comments
+                </h3>
+                
+                {pin.comments && Array.isArray(pin.comments) && pin.comments.length > 0 ? (
+                  <div className="space-y-4">
+                    {pin.comments.map((comment, i) => (
+                      <div key={i} className="flex group">
+                        <Link to={`/user/${comment.user}`} className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-bold">
+                            {comment.name && typeof comment.name === 'string'
+                              ? comment.name.slice(0, 1).toUpperCase()
+                              : '?'}
                           </div>
-
-                          {e.user === user._id && (
-                            <button
-                              onClick={() => deleteCommentHander(e._id)}
-                              className="bg-red-500 text-white py-1 px-3 rounded"
-                            >
-                              <MdDelete />
-                            </button>
-                          )}
+                        </Link>
+                        <div className="ml-3 flex-1">
+                          <div className="flex items-center">
+                            <h4 className="font-medium text-gray-800">
+                              {comment.name || "Anonymous"}
+                            </h4>
+                            {comment.user === user._id && (
+                              <button
+                                onClick={() => deleteCommentHandler(comment._id)}
+                                className="ml-auto opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition"
+                                title="Delete comment"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-gray-600 text-sm mt-1">
+                            {comment.comment}
+                          </p>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <p>Be the first one to add comment</p>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
+                    <AlertCircle size={24} className="mb-2 text-gray-400" />
+                    <p>No comments yet</p>
+                    <p className="text-sm mt-1">Be the first one to share your thoughts!</p>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

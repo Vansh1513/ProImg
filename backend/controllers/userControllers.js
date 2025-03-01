@@ -34,6 +34,7 @@ export const registerWithOtp = TryCatch(async (req, res) => {
   }
 
   const otp = crypto.randomInt(100000, 999999); // Generate OTP
+  console.log(otp);
   TEMP_USERS[email] = {
     name,
     password,
@@ -147,71 +148,114 @@ export const loginUser=TryCatch(async(req,res)=>{
     })
 
 });
-
+ 
 export const forgetPassword=TryCatch(async(req,res)=>{
-    const {email} =req.body;
+  const {email} =req.body;
 
-     
-  if (Array.isArray(email) || !validator.isEmail(email)) {
-    return res.status(400).json({
-      message: "Invalid email format",
+   
+if (Array.isArray(email) || !validator.isEmail(email)) {
+  return res.status(400).json({
+    message: "Invalid email format",
+  });
+}
+  const user= await User.findOne({email})
+  if(!user)
+      return res.status(400).json({
+          message:"No user found",
+  })
+
+  const otp = crypto.randomInt(100000, 999999);
+  TEMP_USERS[email] = {
+    otp,
+    expiresAt: Date.now() + 5 * 60 * 1000, 
+  };
+  
+  const transporter = nodemailer.createTransport({
+      service:"gmail",
+      secure:true,
+      auth:{
+          user:process.env.MY_GMAIL,
+          pass:process.env.MY_PASS,
+      }
+  })
+  console.log(otp);
+  
+  try {
+    
+    await transporter.sendMail({
+      from: process.env.MY_GMAIL,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is: ${otp}`,
+    });
+
+   
+    const token = jwt.sign({ email }, process.env.JWT_SEC, { expiresIn: "5m" });
+
+    res.status(200).json({
+      message: "OTP sent successfully.",
+      token,
+    });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({
+      message: "Failed to send OTP",
+      error: error.message,
     });
   }
-    const user= await User.findOne({email})
-    if(!user)
-        return res.status(400).json({
-            message:"No user found",
-    })
-    
-    const transporter = nodemailer.createTransport({
-        service:"gmail",
-        secure:true,
-        auth:{
-            user:process.env.MY_GMAIL,
-            pass:process.env.MY_PASS,
-        }
-    })
-    
-    const token = jwt.sign({email: user.email},process.env.JWT_SEC,{
-        expiresIn : "3h"
-    })
-    const receiver ={
-        from :" ppc@gmail.com",
-        to:email,
-        subject :"Reset Your Password",
-        text : `Click link to reset password ${process.env.CLIENT_URL}/reset-password/${token}`
-    }
-
-    await transporter.sendMail(receiver);
-    res.status(200).json({
-        
-        message:"Email sent",
-    })
 })
 
-export const resetPassword = TryCatch(async(req,res)=>{
-    
-    // const {email} = req.body;
-    const {token} = req.params;
-    const {password} =req.body;
-    if (!password) return res.status(400).json({
-        message:"NO PASSWORD",
-    })
+export const resetPassword = TryCatch(async (req, res) => {
+const { token } = req.params;
+const { otp, password } = req.body;
 
-    const decode = jwt.verify(token,process.env.JWT_SEC)
-    // console.log(token)wheb
+if (!password) {
+  return res.status(400).json({ message: "Password is required" });
+}
 
-    const user = await User.findOne({email:decode.email}); 
-    const newpass = await bcrypt.hash(password, 10);
-    user.password=newpass;
-    await user.save()
-    res.json({
-        
-        message:" reset successfull",
+if (!otp || !token) {
+  return res.status(400).json({ message: "OTP and token are required" });
+}
 
-    })
+let email;
+try {
+  ({ email } = jwt.verify(token, process.env.JWT_SEC));
+} catch (error) {
+  return res.status(400).json({ message: "Invalid or expired token" });
+}
 
-})
+const tempUser = TEMP_USERS[email];
+if (!tempUser) {
+  console.log("TEMP_USERS:", TEMP_USERS);
+  return res.status(400).json({ message: "No OTP request found for this email" });
+}
+
+console.log("Stored OTP:", tempUser.otp);
+console.log("Provided OTP:", otp);
+
+if (tempUser.expiresAt < Date.now()) {
+  console.log("OTP expired. ExpiresAt:", tempUser.expiresAt, "Current time:", Date.now());
+  delete TEMP_USERS[email];
+  return res.status(400).json({ message: "OTP expired" });
+}
+
+if (tempUser.otp.toString() !== otp.toString()) {
+  console.log("Invalid OTP. Stored:", tempUser.otp, "Provided:", otp);
+  return res.status(400).json({ message: "Invalid OTP" });
+}
+
+const user = await User.findOne({ email });
+if (!user) {
+  return res.status(404).json({ message: "User not found" });
+}
+
+user.password = await bcrypt.hash(password, 10);
+await user.save();
+
+delete TEMP_USERS[email];
+res.json({ message: "Password reset successful" });
+});
+
 
 export const myProfile=TryCatch(async(req,res)=>{
     const user=await User.findById(req.user._id)

@@ -26,38 +26,35 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  // Function to handle forgot password logic
-  async function forgotUser(email, navigate) {
+
+
+  async function forgotUser(email,navigate) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post("/api/user/forget", { email }); // Ensure correct endpoint is used
+      const {data} = await axios.post("/api/user/forget", {email});
       toast.success(data.message);
-      // setUser(data.user);
       setBtnLoading(false);
-      // console.log(data.token);
-      navigate("/forgot");
-
-      // navigate("/reset-password/" + data.token); // Redirect to reset password 
-      
-    } catch (error) {
-      toast.error(error.response.data.message);
-      setBtnLoading(false);
-    }
+      const token =data.token;
+      navigate("/reset-password/"+token);
+    
+  } catch (error) {
+    toast.error(error.response.data.message);
+    setBtnLoading(false);
+  }
   }
 
-  // Function to reset password
-  async function resetUser(token, password,navigate) {
+  async function resetUser(token,otp,password,navigate) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post("/api/user/reset-password/" + token, { password });
+      const {data} = await axios.post("/api/user/reset-password/"+token, {otp,password});
       toast.success(data.message);
-      // setUser(data.user);
       setBtnLoading(false);
       navigate("/login");
-    } catch (error) {
-      toast.error(error.response.data.message);
-      setBtnLoading(false);
-    }
+    
+  } catch (error) {
+    toast.error(error.response.data.message);
+    setBtnLoading(false);
+  }
   }
 
   // Function to register new user
