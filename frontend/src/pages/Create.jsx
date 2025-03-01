@@ -55,7 +55,7 @@ const Create = () => {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8  bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8  bg-gradient-to-b from-gray-900 to-gray-800 ">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Create New Pin</h1>
         

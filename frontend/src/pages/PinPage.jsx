@@ -172,7 +172,7 @@ const PinPage = ({ user }) => {
     : null;
 
   return (
-    <div className=" min-h-screen py-8 px-4 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className=" min-h-screen py-8 px-4 bg-gradient-to-b from-gray-900 to-gray-800 ">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-sm shadow-lg overflow-hidden">
           <div className="flex flex-col lg:flex-row">
