@@ -37,23 +37,34 @@ const UserProfile = ({ user: loggedInUser }) => {
     }
   }
 
-  // Handle follow/unfollow action
+
   const followHandler = async () => {
     if (!loggedInUser || !loggedInUser._id) {
       navigate("/login");
       return;
     }
-    
+  
     try {
       setFollowLoading(true);
-      await followUser(user._id, fetchUser);
+      
+      // Optimistically update UI before making API call
+      setUser((prevUser) => ({
+        ...prevUser,
+        followers: isFollow
+          ? prevUser.followers.filter((id) => id !== loggedInUser._id)  // Unfollow
+          : [...prevUser.followers, loggedInUser._id], // Follow
+      }));
+      
       setIsFollow(!isFollow);
+  
+      await followUser(user._id, fetchUser); // Call API
     } catch (error) {
       console.error("Follow error:", error);
     } finally {
       setFollowLoading(false);
     }
   };
+  
 
   // Filter pins safely
   const userPins = pins && user && user._id
@@ -156,15 +167,20 @@ const UserProfile = ({ user: loggedInUser }) => {
                   <Users size={18} className="mr-2 text-green-400" />
                   <div>
                     <p className="text-sm text-gray-400">Followers</p>
-                    <p className="text-xl font-bold">{user.followers ? user.followers.length : 0}</p>
+                    <p className="text-xl font-bold"
+                    onClick={() => navigate(`/get/${user._id}`)}
+                    >{user.followers ? user.followers.length : 0}</p>
                   </div>
                 </div>
                 
                 <div className="bg-gray-700 rounded-lg px-4 py-2 flex items-center">
                   <Heart size={18} className="mr-2 text-green-400" />
                   <div>
+                    
                     <p className="text-sm text-gray-400">Following</p>
-                    <p className="text-xl font-bold">{user.following ? user.following.length : 0}</p>
+                    <p className="text-xl font-bold"
+                    onClick={() => navigate(`/get/${user._id}`)}
+                    >{user.following ? user.following.length : 0}</p>
                   </div>
                 </div>
               </div>

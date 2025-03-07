@@ -314,3 +314,28 @@ export const logOutUser=TryCatch(async(req,res)=>{
         message:"Logged out successfully",
     });
 });
+
+
+
+
+export const getUserFollowersAndFollowing = TryCatch(async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId);
+
+
+  const user = await User.findById(userId)
+    .populate("followers", "name email")
+    .populate("following", "name email");
+
+  
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.status(200).json({
+    followers: user.followers,
+    following: user.following,
+  });
+
+
+});

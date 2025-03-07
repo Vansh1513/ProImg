@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PinData } from "../context/PinContext";
 import PinCard from "../components/PinCard";
 import toast from "react-hot-toast";
@@ -9,7 +9,7 @@ import { LogOut, UserCircle, Grid, Loader } from "lucide-react";
 
 const Account = ({ user }) => {
   const navigate = useNavigate();
-  const { setIsAuth, setUser } = UserData();
+  const { setIsAuth, setUser,fetchUser } = UserData();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { pins, loading } = PinData();
 
@@ -33,6 +33,13 @@ const Account = ({ user }) => {
   const userPins = pins && user && user._id
     ? pins.filter((pin) => pin.owner === user._id)
     : [];
+
+  useEffect(() => {
+    fetchUser();
+  
+    
+  }, [])
+  
 
   // Handle case where user data isn't available
   if (!user || !user._id) {
@@ -75,12 +82,16 @@ const Account = ({ user }) => {
                 
                 <div className="bg-gray-700 rounded-lg px-4 py-2">
                   <p className="text-sm text-gray-400">Followers</p>
-                  <p className="text-xl font-bold">{user.followers ? user.followers.length : 0}</p>
+                  <p className="text-xl font-bold"
+                  onClick={() => navigate(`/get/${user._id}`)}
+                  >{user.followers ? user.followers.length : 0}</p>
                 </div>
                 
                 <div className="bg-gray-700 rounded-lg px-4 py-2">
                   <p className="text-sm text-gray-400">Following</p>
-                  <p className="text-xl font-bold">{user.following ? user.following.length : 0}</p>
+                  <p className="text-xl font-bold"
+                  onClick={() => navigate(`/get/${user._id}`)}
+                  >{user.following ? user.following.length : 0}</p>
                 </div>
               </div>
               

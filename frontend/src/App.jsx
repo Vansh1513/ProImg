@@ -12,6 +12,7 @@ import UserProfile from "./pages/UserProfile";
 import Forgot from "./pages/Forgot";
 import Reset from "./pages/Reset";
 import OtpVerify from "./pages/OtpVerify";
+import UserConnections from "./pages/UserConnections";
 
 const App = () => {
   const { loading, isAuth, user,forgotUser,resetUser,} = UserData(); // Access context data for loading and authentication status
@@ -53,6 +54,12 @@ const App = () => {
               path="/reset-password/:token"
               element={<Reset />}
             />
+            <Route
+              path="/get/:id"
+              element={<UserConnections />}
+            />
+
+            
            
           </Routes>
         </BrowserRouter>

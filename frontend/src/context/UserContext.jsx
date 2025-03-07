@@ -135,6 +135,7 @@ export const UserProvider = ({ children }) => {
         forgotUser, // Make sure forgotUser is exposed here
         resetUser,
         verify,
+        fetchUser,
       }}
     >
       {children}

@@ -139,3 +139,32 @@ export const deleteComment = TryCatch(async (req, res) => {
       message: "Pin updated",
     });
   });
+
+
+  export const likeAndUnlike = TryCatch(async (req, res) => {
+    const pin = await Pin.findById(req.params.id);
+    const loggedInUser = req.user._id
+  
+    if (!pin) {
+      return res.status(400).json({ message: "No pin with this id" });
+    }
+  
+    if (pin.owner.toString() === loggedInUser.toString()) {
+      return res.status(400).json({ message: "Can't like your own pin" });
+    }
+  
+    const isLiked = pin.likes.includes(loggedInUser);
+  
+    if (isLiked) {
+      
+      pin.likes = pin.likes.filter((id) => id.toString() !== loggedInUser.toString());
+      await pin.save();
+      return res.json({ message: "Disliked" });
+    } else {
+      
+      pin.likes.push(loggedInUser);
+      await pin.save();
+      return res.json({ message: "Pin liked" });
+    }
+  });
+  

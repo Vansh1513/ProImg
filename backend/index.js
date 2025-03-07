@@ -4,6 +4,10 @@ import connectDb from "./database/db.js";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
 import path from "path";
+import passport from './controllers/passport.js';
+import session from "express-session";
+
+
 
 dotenv.config();
 
@@ -18,15 +22,17 @@ const app = express();
 
 const port = process.env.PORT;
 
-//using middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(session({ secret: "your_secret_key", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-// importing routes
+
 import userRoutes from "./routes/userRoutes.js";
 import pinRoutes from "./routes/pinRoutes.js";
 
-// using routes
+
 app.use("/api/user", userRoutes);
 app.use("/api/pin", pinRoutes);
 
