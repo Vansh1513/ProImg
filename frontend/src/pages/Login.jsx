@@ -9,7 +9,10 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { FaGoogle } from "react-icons/fa";
 
 const googleLogin = () => {
-    window.location.href = "http://localhost:5000/api/user/auth/google"; // Ensure this matches your backend URL
+    window.location.href = process.env.NODE_ENV === "production"
+  ? "https://proimg.onrender.com/api/user/auth/google"
+ 
+    : "http://localhost:5000/api/user/auth/google";
 };
 
 const Login = () => {
