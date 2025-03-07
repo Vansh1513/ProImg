@@ -8,12 +8,12 @@ import { motion } from 'framer-motion'
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { FaGoogle } from "react-icons/fa";
 
-const googleLogin = () => {
-    window.location.href = process.env.NODE_ENV === "production"
-  ? "https://proimg.onrender.com/api/user/auth/google"
+// const googleLogin = () => {
+//     window.location.href = process.env.NODE_ENV === "production"
+//   ? "https://proimg.onrender.com/api/user/auth/google"
  
-    : "http://localhost:5000/api/user/auth/google";
-};
+//     : "http://localhost:5000/api/user/auth/google";
+// };
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -192,7 +192,7 @@ const Login = () => {
                             <span className='px-2 bg-[#1A1A1D] text-gray-400'>or</span>
                         </div>
                     </div>
-                    <motion.button 
+                    {/* <motion.button 
                                                 type="button"
                                                 className="w-full py-2 px-4 border border-gray-600 rounded-md text-white bg-gray-800 hover:bg-gray-700 flex items-center justify-center space-x-2 mb-4"
                                                 onClick={googleLogin}
@@ -202,7 +202,7 @@ const Login = () => {
                                             >
                                                 <FaGoogle className="text-red-500" />
                                                 <span>Sign in with Google</span>
-                                            </motion.button>
+                                            </motion.button> */}
                     
                     <div className='text-gray-300'>
                         Don't have an account?{' '}

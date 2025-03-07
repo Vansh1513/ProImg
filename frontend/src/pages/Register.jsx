@@ -21,9 +21,9 @@ const Register = () => {
     const navigate = useNavigate()
     const { fetchPins } = PinData()
     
-    const googleLogin = () => {
-        window.location.href = "http://localhost:5000/api/user/auth/google"
-    }
+    // const googleLogin = () => {
+    //     window.location.href = "http://localhost:5000/api/user/auth/google"
+    // }
     
     const handleChange = (e) => {
         const { id, value } = e.target
@@ -258,7 +258,7 @@ const Register = () => {
                             </div>
                         </div>
                         
-                        <motion.button 
+                        {/* <motion.button 
                             type="button"
                             className="w-full py-2 px-4 border border-gray-600 rounded-md text-white bg-gray-800 hover:bg-gray-700 flex items-center justify-center space-x-2 mb-4"
                             onClick={googleLogin}
@@ -268,7 +268,7 @@ const Register = () => {
                         >
                             <FaGoogle className="text-red-500" />
                             <span>Sign in with Google</span>
-                        </motion.button>
+                        </motion.button> */}
                         
                         <div className='text-gray-300'>
                             Already have an account?{' '}

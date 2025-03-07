@@ -4,8 +4,8 @@ import connectDb from "./database/db.js";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
 import path from "path";
-import passport from './controllers/passport.js';
-import session from "express-session";
+// import passport from './controllers/passport.js';
+// import session from "express-session";
 
 
 
@@ -24,9 +24,9 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({ secret: process.env.JWT_SEC, resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(session({ secret: process.env.JWT_SEC, resave: false, saveUninitialized: false }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
 import userRoutes from "./routes/userRoutes.js";
