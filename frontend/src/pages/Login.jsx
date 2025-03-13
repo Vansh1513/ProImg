@@ -8,9 +8,12 @@ import { motion } from 'framer-motion'
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { FaGoogle } from "react-icons/fa";
 
+
 const googleLogin = () => {
+    
     window.location.href = "http://localhost:5000/api/user/auth/google";
-};
+  }
+
 
 const Login = () => {
     const [email, setEmail] = useState("")

@@ -24,7 +24,14 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({ secret: process.env.JWT_SEC, resave: false, saveUninitialized: false }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'qwertyuiop',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// Initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
 
