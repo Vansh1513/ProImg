@@ -209,7 +209,15 @@ const UserProfile = ({ user: loggedInUser }) => {
                       ? "Unfollow" 
                       : "Follow"}
                 </button>
+              
+                    
               )}
+                  {/* <button
+                    onClick={() => navigate(`/chat/${user._id}`)}
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                  >
+                    Message
+                  </button> */}
             </div>
           </div>
         </div>
