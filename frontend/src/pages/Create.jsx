@@ -57,7 +57,7 @@ const Create = () => {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8  bg-gradient-to-b from-gray-900 to-gray-800 ">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Create New Pin</h1>
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">Create New Pin</h1>
         
         <div className="flex flex-col lg:flex-row gap-8 justify-center">
           {/* Image Upload Section */}

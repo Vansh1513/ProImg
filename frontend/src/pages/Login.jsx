@@ -201,7 +201,7 @@ const Login = () => {
                                                 whileTap={{ scale: 0.98 }}
                                             >
                                                 <FaGoogle className="text-green-500" />
-                                                <span>Sign up with Google</span>
+                                                <span>Sign in with Google</span>
                                             </motion.button>
                     
                     <div className='text-gray-300'>

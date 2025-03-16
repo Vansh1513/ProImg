@@ -267,7 +267,7 @@ const Register = () => {
                             whileTap={{ scale: 0.98 }}
                         >
                             <FaGoogle className="text-red-500" />
-                            <span>Sign in with Google</span>
+                            <span>Sign up with Google</span>
                         </motion.button>
                         
                         <div className='text-gray-300'>
