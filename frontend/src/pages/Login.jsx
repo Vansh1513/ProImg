@@ -11,7 +11,7 @@ import { FaGoogle } from "react-icons/fa";
 
 const googleLogin = () => {
     
-    window.location.href = "http://localhost:5000/api/user/auth/google";
+    window.location.href = "https://proimg.onrender.com/api/user/auth/google";
   }
 
 

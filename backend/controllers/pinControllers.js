@@ -149,10 +149,6 @@ export const deleteComment = TryCatch(async (req, res) => {
       return res.status(400).json({ message: "No pin with this id" });
     }
   
-    if (pin.owner.toString() === loggedInUser.toString()) {
-      return res.status(400).json({ message: "Can't like your own pin" });
-    }
-  
     const isLiked = pin.likes.includes(loggedInUser);
   
     if (isLiked) {
@@ -167,4 +163,34 @@ export const deleteComment = TryCatch(async (req, res) => {
       return res.json({ message: "Pin liked" });
     }
   });
+  
+
+  export const getLikes = TryCatch(async (req, res) => {
+    const pin = await Pin.findById(req.params.id).populate("likes", "name");
+  
+    if (!pin) {
+      return res.status(400).json({ message: "No pin with this id" });
+    }
+  
+    res.json(pin.likes);
+  }
+  );
+
+
+  export const myLikes = TryCatch(async (req, res) => {
+    try {
+      const userId = mongoose.Types.ObjectId(req.user._id); 
+  
+      const pins = await Pin.find({ likes: userId });
+  
+      res.status(200).json({
+        success: true,
+        pins,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   

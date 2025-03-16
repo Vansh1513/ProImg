@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { UserData } from "./UserContext";
 import toast from "react-hot-toast";
 import { set } from "mongoose";
+import { CodeSquare } from "lucide-react";
 
 const PinContext = createContext();
 
@@ -59,6 +60,29 @@ export const PinProvider = ({ children }) => {
       toast.error(error.response.data.message);
     }
   }
+
+  async function likePin(id) {
+    try {
+      const { data } = await axios.post("/api/pin/like/" + id);
+      toast.success(data.message);
+      fetchPin(id);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  }
+
+  // const [likes, setLikes] = useState([])
+ 
+  // async function getCountOfLikes(id) {
+  //   try {
+  //     console.log("id", id);
+  //     const { data } = await axios.get("/api/pin/likes/" + id);
+  //     setLikes(data.id);
+  //     console.log(data.id);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   async function deleteComment(id, commentId) {
     try {
@@ -129,6 +153,9 @@ export const PinProvider = ({ children }) => {
         deleteComment,
         deletePin,
         addPin,
+        likePin,
+        // getCountOfLikes,
+        // likes,
         fetchPins,
       }}
     >

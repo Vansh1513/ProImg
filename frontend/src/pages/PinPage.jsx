@@ -13,6 +13,7 @@ import {
   MessageSquare,
   AlertCircle,
 } from "lucide-react";
+import { get } from "mongoose";
 
 const PinPage = ({ user }) => {
   const params = useParams();
@@ -27,6 +28,9 @@ const PinPage = ({ user }) => {
     addComment,
     deleteComment,
     deletePin,
+    likePin,
+    // likes,
+    // getCountOfLikes,
   } = PinData();
 
   // Component state
@@ -54,37 +58,21 @@ const PinPage = ({ user }) => {
     );
   }
 
-  // First, in your PinData context, add this function:
-const likePin = async (pinId) => {
-  try {
-    const response = await fetch(`/api/pins/like/${pinId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include'
-    });
-    
-    const data = await response.json();
-    
-    // Update pin in state to reflect new like status
-    if (pin && pin._id === pinId) {
-      setPin(prevPin => ({
-        ...prevPin,
-        likes: data.likes || prevPin.likes
-      }));
+  useEffect(() => {
+    fetchPin();
+  }, [])
+  
+
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    if (pin && Array.isArray(pin.likes)) {
+      setLiked(pin.likes.includes(user._id));
     }
-    
-    return data;
-  } catch (error) {
-    console.error("Error liking pin:", error);
-    throw error;
-  }
-};
+  }, [pin,user._id]);
+  
 
-// Add likePin to the context value that's returned
 
-  // Fetch pin data when component mounts or ID changes
   useEffect(() => {
     if (params.id) {
       setError(null);
@@ -92,9 +80,8 @@ const likePin = async (pinId) => {
         setError(err?.message || "Failed to load pin details")
       );
     }
-  }, [params.id]); // Removed fetchPin from dependencies
+  }, [params.id]);
 
-  // Update local state when pin data changes
   useEffect(() => {
     if (pin) {
       setTitle(pin.title || "");
@@ -102,7 +89,6 @@ const likePin = async (pinId) => {
     }
   }, [pin]);
 
-  // Handler functions
   const editHandler = () => {
     setEdit(!edit);
   };
@@ -119,18 +105,6 @@ const likePin = async (pinId) => {
       setError(err?.message || "Failed to update pin");
     }
   };
-
-  const likeHandler = (e) => {
-    e.stopPropagation();
-    try {
-      likePin(pin._id);
-    } catch (err) {
-      setError(err?.message || "Failed to like/unlike pin");
-    }
-  };
-  
-  // Check if current user has liked the pin
-  const isLiked = pin.likes && Array.isArray(pin.likes) && user && pin.likes.includes(user._id);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -160,6 +134,15 @@ const likePin = async (pinId) => {
       } catch (err) {
         setError(err?.message || "Failed to delete pin");
       }
+    }
+  };
+  const likeHandler = () => {
+    try {
+      likePin(pin._id);
+     
+      setLiked(!liked);
+    } catch (err) {
+      setError(err?.message || "Failed to like pin");
     }
   };
 
@@ -247,9 +230,20 @@ const likePin = async (pinId) => {
 
               {/* Image actions overlay */}
               <div className="absolute top-4 right-4 flex space-x-2">
-                <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition">
-                  <Heart size={20} className="text-gray-700" />
+                <button
+                  onClick={likeHandler}
+                  className={`w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition ${
+                    liked ? "bg-red-100" : ""
+                  }`}
+                >
+                  <Heart
+                    size={20}
+                    className={
+                      liked ? "text-red-500 fill-red-500" : "text-gray-700"
+                    }
+                  />
                 </button>
+
                 <button
                   className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md hover:bg-gray-100"
                   onClick={(e) => {
@@ -381,6 +375,14 @@ const likePin = async (pinId) => {
                     ? pin.comments.length
                     : 0}{" "}
                   comments
+                </span>
+
+                <Heart size={14} className="mr-1 ml-2" />
+                <span>
+                  {pin.likes && Array.isArray(pin.likes)
+                    ? pin.likes.length
+                    : 0}{" "}
+                  Likes
                 </span>
               </div>
 
