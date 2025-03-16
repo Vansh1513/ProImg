@@ -42,9 +42,7 @@ const PinCard = ({ pin }) => {
         {/* Overlay with quick actions */}
         <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-end justify-between p-3 opacity-0 hover:opacity-100">
           <div className="flex gap-2">
-            <button className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md hover:bg-gray-100">
-              <Heart size={16} className="text-gray-700" />
-            </button>
+            
             <button
               className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md hover:bg-gray-100"
               onClick={(e) => {
