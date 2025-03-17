@@ -57,10 +57,9 @@ const Create = () => {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8  bg-gradient-to-b from-gray-900 to-gray-800 ">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">Create New Pin</h1>
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">Create New Post</h1>
         
         <div className="flex flex-col lg:flex-row gap-8 justify-center">
-          {/* Image Upload Section */}
           <div className="w-full lg:w-1/2 bg-white rounded-xl shadow-md overflow-hidden">
             {filePrev ? (
               <div className="relative">
@@ -115,7 +114,7 @@ const Create = () => {
                 <input
                   type="text"
                   id="title"
-                  placeholder="Add a title that describes your pin"
+                  placeholder="Add a title that describes your Post"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -133,7 +132,7 @@ const Create = () => {
                 <textarea
                   id="pin"
                   rows="4"
-                  placeholder="Tell everyone what your pin is about"
+                  placeholder="Tell everyone what your post is about"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
@@ -154,7 +153,7 @@ const Create = () => {
                     <span>Creating...</span>
                   </div>
                 ) : (
-                  "Create Pin"
+                  "Create Post"
                 )}
               </button>
             </form>
