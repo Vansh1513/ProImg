@@ -441,31 +441,31 @@ const PinPage = ({ user }) => {
               <div className="flex items-center text-gray-400 text-sm mb-6 bg-gray-700 py-3 px-4 rounded-lg">
                 {formattedDate && (
                   <>
-                    <Clock size={16} className="mr-1" />
+                    <Clock size={20} className="mr-1" />
                     <span>{formattedDate}</span>
                     <div className="mx-3 h-1 w-1 rounded-full bg-gray-500"></div>
                   </>
                 )}
-                <MessageSquare size={16} className="mr-1" />
+                <MessageSquare size={20} className="mr-1" />
                 <span>
                   {pin.comments && Array.isArray(pin.comments)
                     ? pin.comments.length
                     : 0}{" "}
-                  comments
+                  
                 </span>
 
                 <div className="mx-3 h-1 w-1 rounded-full bg-gray-500"></div>
 
-                <Heart size={16} className="mr-1" />
+                <Heart size={20} className="mr-1" />
                 <span>
                   {pin.likes && Array.isArray(pin.likes) ? pin.likes.length : 0}{" "}
-                  likes
+                  
                 </span>
 
                 <div className="flex-grow"></div>
 
-                <Eye size={16} className="mr-1" />
-                <span>{Math.floor(Math.random() * 1000) + 100} views</span>
+                <Eye size={20} className=" ml-1 mr-1" />
+                <span>{Math.floor(Math.random() * 1000) + 100} </span>
               </div>
 
               {/* Creator profile */}

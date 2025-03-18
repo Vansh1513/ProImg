@@ -17,7 +17,7 @@ const UserProfile = ({ user: loggedInUser }) => {
   const { followUser } = UserData();
   const { pins, loading: pinsLoading } = PinData();
 
-  // Fetch user data
+  
   async function fetchUser() {
     try {
       setLoading(true);
@@ -25,7 +25,7 @@ const UserProfile = ({ user: loggedInUser }) => {
       const { data } = await axios.get(`/api/user/${params.id}`);
       setUser(data);
       
-      // Check if logged-in user follows this user
+    
       if (data.followers && loggedInUser && loggedInUser._id) {
         setIsFollow(data.followers.includes(loggedInUser._id));
       }
@@ -37,6 +37,10 @@ const UserProfile = ({ user: loggedInUser }) => {
     }
   }
 
+
+  const handleMessageClick = () => {
+    navigate(`/messages/${params.id}`);
+  };
 
   const followHandler = async () => {
     if (!loggedInUser || !loggedInUser._id) {
@@ -209,9 +213,19 @@ const UserProfile = ({ user: loggedInUser }) => {
                       ? "Unfollow" 
                       : "Follow"}
                 </button>
+
+                
               
                     
               )}
+               <button
+                    onClick={handleMessageClick}
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  >
+                    <MessageSquare size={18} className="mr-1" />
+                    Message
+                  </button>
+
                   {/* <button
                     onClick={() => navigate(`/chat/${user._id}`)}
                     className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"

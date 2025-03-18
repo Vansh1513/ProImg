@@ -14,6 +14,8 @@ import Reset from "./pages/Reset";
 import OtpVerify from "./pages/OtpVerify";
 import UserConnections from "./pages/UserConnections";
 import Chat from "./pages/Chat";
+import MessageChat from "./pages/MessageChat";
+import Conversations from "./pages/Conversation";
 
 const App = () => {
   const { loading, isAuth, user,forgotUser,resetUser,} = UserData(); // Access context data for loading and authentication status
@@ -61,9 +63,14 @@ const App = () => {
               element={isAuth?<UserConnections />:<Login/>}
             />
             <Route
-              path="/chat"
+              path="/messages/:userId"
               
-              element={<Chat user={user}/>}
+              element={<MessageChat user={user}/>}
+            />
+            <Route
+              path="/messages"
+              
+              element={<Conversations/>}
             />
 
             

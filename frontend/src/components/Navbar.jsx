@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home as HomeIcon, PlusCircle, User, Menu, X } from 'lucide-react';
+import { Home as HomeIcon, PlusCircle, User, Menu, X, MessageCircle } from 'lucide-react';
 import myimage from '../assets/pra.png';
 
 const Navbar = ({ user }) => {
@@ -35,6 +35,13 @@ const Navbar = ({ user }) => {
             >
               <PlusCircle size={18} className="mr-1.5" />
               Create
+            </Link>
+            <Link 
+              to="/messages" 
+              className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:bg-gray-800 hover:text-white transition"
+            >
+              <MessageCircle size={18} className="mr-1.5" />
+              Message
             </Link>
             <Link 
               to="/account" 
