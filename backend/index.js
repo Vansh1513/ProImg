@@ -20,13 +20,31 @@ cloudinary.v2.config({
 });
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
 
+app.use(cors());
 
 
 const port = process.env.PORT;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'qwertyuiop',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 
