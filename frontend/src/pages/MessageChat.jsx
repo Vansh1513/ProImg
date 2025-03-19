@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { ArrowLeft, Send, MoreVertical, Image, Mic, Heart, Paperclip, Smile } from "lucide-react";
+import { ArrowLeft, Send, MoreVertical, Image, Mic, Heart, Paperclip, Smile, UserPlus, User2Icon } from "lucide-react";
 import { format } from "date-fns";
 
 const MessageChat = ({ currentUser }) => {
@@ -40,7 +40,6 @@ const MessageChat = ({ currentUser }) => {
     };
   }, [currentUser?._id]);
 
-  // Fetch user and messages
   useEffect(() => {
     if (!userId || !currentUser?._id) return;
 
@@ -76,7 +75,6 @@ const MessageChat = ({ currentUser }) => {
     };
   }, [userId, currentUser?._id]);
 
-  // Listen to socket events
   useEffect(() => {
     if (!socketRef.current || !userId || !currentUser?._id) return;
 
@@ -111,12 +109,10 @@ const MessageChat = ({ currentUser }) => {
     };
   }, [userId, currentUser?._id]);
 
-  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle typing indicator
   const handleTyping = () => {
     if (!socketRef.current || !userId) return;
 
@@ -128,7 +124,6 @@ const MessageChat = ({ currentUser }) => {
     }, 2000);
   };
 
-  // Handle message send
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !userId || !currentUser?._id) return;
@@ -160,7 +155,6 @@ const MessageChat = ({ currentUser }) => {
     }
   };
 
-  // Format last seen time
   const formatLastSeen = (timestamp) => {
     if (!timestamp) return "";
     return `Active ${format(new Date(timestamp), "h:mm a")}`;
@@ -168,7 +162,6 @@ const MessageChat = ({ currentUser }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white">
-      {/* Header - Instagram style */}
       <div className="bg-black p-4 flex items-center justify-between border-b border-gray-800">
         <div className="flex items-center">
           <button onClick={() => navigate("/messages")} className="mr-4">
@@ -179,7 +172,7 @@ const MessageChat = ({ currentUser }) => {
               <div className="relative">
                 <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
                   <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-white">{currentUser.name?.[0]?.toUpperCase()}</span>
+                    <span className="text-sm font-bold text-white"><User2Icon/></span>
                   </div>
                 </div>
                 {isOnline && (
