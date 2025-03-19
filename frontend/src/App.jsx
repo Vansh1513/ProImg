@@ -18,12 +18,12 @@ import MessageChat from "./pages/MessageChat";
 import Conversations from "./pages/Conversation";
 
 const App = () => {
-  const { loading, isAuth, user,forgotUser,resetUser,} = UserData(); // Access context data for loading and authentication status
+  const { loading, isAuth, user} = UserData(); 
   console.log(isAuth);
   return (
     <>
       {loading ? (
-        <Loading /> // Show loading animation while user data is being fetched
+        <Loading />
       ) : (
         <BrowserRouter>
           
@@ -51,7 +51,7 @@ const App = () => {
             />
             <Route
               path="/forgot"
-              element={!isAuth ? <Forgot /> : <Home />} // Show Forgot page if not authenticated
+              element={!isAuth ? <Forgot /> : <Home />} 
             />
             <Route
               path="/reset-password/:token"
@@ -65,12 +65,12 @@ const App = () => {
             <Route
               path="/messages/:userId"
               
-              element={<MessageChat user={user}/>}
+              element={isAuth?<MessageChat currentUser={user}/>:<Login/>} 
             />
             <Route
               path="/messages"
               
-              element={<Conversations/>}
+              element={isAuth?<Conversations/>:<Login/>}
             />
 
             

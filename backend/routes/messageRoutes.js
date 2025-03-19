@@ -20,13 +20,29 @@ router.post("/send", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Receiver not found" });
     }
 
-    const newMessage = new Message({ sender: senderId, receiver: receiverId, content });
-    await newMessage.save();
+    const newMessage = new Message({ 
+      sender: senderId, 
+      receiver: receiverId, 
+      content,
+      read: false,
+      createdAt: new Date()
+    });
     
-    res.status(201).json(newMessage);
+    await newMessage.save();
+
+    const populatedMessage = await Message.findById(newMessage._id)
+      .populate("sender", "name email avatar")
+      .populate("receiver", "name email avatar");
+
+    const io = req.app.get("io");
+    if (io) {
+      io.to(receiverId.toString()).emit("receiveMessage", populatedMessage);
+    }
+
+    res.status(201).json(populatedMessage);
   } catch (error) {
     console.error("Error sending message:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
@@ -34,78 +50,79 @@ router.get("/conversations", isAuth, async (req, res) => {
   try {
     const userId = req.user._id;
 
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
     const conversations = await Message.aggregate([
       {
-        $match: { $or: [{ sender: userId }, { receiver: userId }] }
+        $match: { 
+          $or: [
+            { sender: userObjectId }, 
+            { receiver: userObjectId }
+          ] 
+        }
       },
       { $sort: { createdAt: -1 } },
       {
         $group: {
           _id: {
             $cond: {
-              if: { $gt: ["$sender", "$receiver"] },
-              then: { sender: "$receiver", receiver: "$sender" },
-              else: { sender: "$sender", receiver: "$receiver" }
+              if: { $eq: ["$sender", userObjectId] },
+              then: "$receiver",
+              else: "$sender"
             }
           },
-          lastMessage: { $first: "$$ROOT" }
-        }
-      },
-      {
-        $project: {
-          userId: {
-            $cond: [
-              { $eq: ["$_id.sender", userId] },
-              "$_id.receiver",
-              "$_id.sender"
-            ]
-          },
-          lastMessage: 1
+          lastMessage: { $first: "$$ROOT" },
+          messages: { $push: "$$ROOT" }
         }
       },
       {
         $lookup: {
           from: "users",
-          localField: "userId",
+          localField: "_id",
           foreignField: "_id",
-          as: "user"
+          as: "userDetails"
         }
       },
-      { $unwind: "$user" },
+      { $unwind: "$userDetails" },
       {
-        $lookup: {
-          from: "messages",
-          let: { partnerId: "$userId" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
+        $addFields: {
+          unreadCount: {
+            $size: {
+              $filter: {
+                input: "$messages",
+                as: "message",
+                cond: {
                   $and: [
-                    { $eq: ["$sender", "$$partnerId"] },
-                    { $eq: ["$receiver", userId] },
-                    { $eq: ["$read", false] }
+                    { $eq: ["$$message.receiver", userObjectId] },
+                    { $eq: ["$$message.read", false] }
                   ]
                 }
               }
-            },
-            { $count: "unreadCount" }
-          ],
-          as: "unread"
+            }
+          }
         }
       },
       {
         $project: {
-          user: { _id: 1, name: 1, email: 1 },
+          _id: 1,
+          user: {
+            _id: "$userDetails._id",
+            name: "$userDetails.name",
+            email: "$userDetails.email",
+            avatar: { $ifNull: ["$userDetails.avatar", null] }
+          },
           lastMessage: 1,
-          unreadCount: { $arrayElemAt: ["$unread.unreadCount", 0] }
+          unreadCount: 1,
+          lastActivity: "$lastMessage.createdAt"
         }
-      }
+      },
+      { $sort: { lastActivity: -1 } }
     ]);
 
     res.json(conversations);
   } catch (error) {
     console.error("Error getting conversations:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
@@ -125,17 +142,93 @@ router.get("/:userId", isAuth, async (req, res) => {
       ]
     })
       .sort({ createdAt: 1 })
-      .populate("sender receiver", "name email");
+      .populate("sender", "name email avatar")
+      .populate("receiver", "name email avatar");
 
-    await Message.updateMany(
+    const unreadMessages = await Message.updateMany(
       { sender: otherUserId, receiver: currentUserId, read: false },
       { read: true }
     );
 
+    if (unreadMessages.modifiedCount > 0) {
+      const io = req.app.get("io");
+      if (io) {
+        io.to(otherUserId.toString()).emit("messagesRead", currentUserId.toString());
+      }
+    }
+
     res.json(messages);
   } catch (error) {
     console.error("Error getting messages:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+router.put("/read/:messageId", isAuth, async (req, res) => {
+  try {
+    const messageId = req.params.messageId;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(messageId)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
+    const message = await Message.findById(messageId);
+    
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    if (message.receiver.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Not authorized to mark this message as read" });
+    }
+
+    if (!message.read) {
+      message.read = true;
+      await message.save();
+
+      const io = req.app.get("io");
+      if (io) {
+        io.to(message.sender.toString()).emit("messageReadUpdate", messageId);
+      }
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error marking message as read:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+router.delete("/:messageId", isAuth, async (req, res) => {
+  try {
+    const messageId = req.params.messageId;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(messageId)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
+    const message = await Message.findById(messageId);
+    
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    if (message.sender.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this message" });
+    }
+
+    await Message.findByIdAndDelete(messageId);
+
+    const io = req.app.get("io");
+    if (io) {
+      io.to(message.receiver.toString()).emit("messageDeleted", messageId);
+    }
+
+    res.json({ success: true, message: "Message deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 

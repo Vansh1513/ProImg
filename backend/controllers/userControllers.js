@@ -13,8 +13,7 @@ dotenv.config();
 
 
 
- // Temporary storage for unverified users
-const TEMP_USERS = {}; // Use Redis or a database for better scalability
+const TEMP_USERS = {}; 
 
 export const registerWithOtp = TryCatch(async (req, res) => {
   const { name, email, password } = req.body;
