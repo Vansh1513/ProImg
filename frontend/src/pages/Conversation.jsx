@@ -12,11 +12,13 @@ import {
   Bell,
   Filter,
   X,
-  User
+  User,
+  UserCog
 } from "lucide-react";
 import { format, isToday, isYesterday, isThisWeek, isThisYear } from "date-fns";
+import { FaUserPlus } from "react-icons/fa";
 
-const Conversations = () => {
+const Conversations = ({loggedUser}) => {
   const [conversations, setConversations] = useState([]);
   const [filteredConversations, setFilteredConversations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -177,18 +179,19 @@ const Conversations = () => {
           
           <div className="flex items-center">
             <button 
-              onClick={() => navigate("/contacts")} 
+              onClick={() => navigate(`/get/${loggedUser._id}`)}                     
+
               className="p-2 hover:bg-gray-700 rounded-full transition-colors"
               aria-label="Contacts"
             >
-              <Users size={20} className="text-gray-400" />
+              <FaUserPlus size={24} className="text-green-400" />
             </button>
             <button 
               onClick={() => navigate("/messages/new")} 
               className="p-2 hover:bg-gray-700 rounded-full transition-colors ml-2"
               aria-label="New message"
             >
-              <Plus size={20} className="text-green-400" />
+            
             </button>
           </div>
         </div>

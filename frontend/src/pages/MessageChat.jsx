@@ -198,7 +198,6 @@ const MessageChat = ({ currentUser }) => {
         </div>
       </div>
 
-      {/* Messages - Instagram style */}
       <div className="flex-1 overflow-y-auto p-4 bg-black">
         {loading ? (
           <div className="flex justify-center items-center h-full">

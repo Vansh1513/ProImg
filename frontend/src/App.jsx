@@ -70,7 +70,7 @@ const App = () => {
             <Route
               path="/messages"
               
-              element={isAuth?<Conversations/>:<Login/>}
+              element={isAuth?<Conversations loggedUser={user}/>:<Login/>}
             />
 
             

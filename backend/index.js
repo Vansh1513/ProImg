@@ -82,7 +82,7 @@ const onlineUsers = new Map();
 const userRooms = new Map();
 
 io.on("connection", (socket) => {
-  console.log("⚡ New user connected:", socket.id);
+  console.log("New user connected:", socket.id);
 
   socket.on("userOnline", (userId) => {
     if (!userId) return;
@@ -123,7 +123,7 @@ io.on("connection", (socket) => {
   socket.on("markAsRead", ({ senderId, receiverId }) => {
     if (senderId) {
       io.to(senderId).emit("messagesRead", receiverId);
-      console.log(`📖 Messages marked as read for ${senderId}`);
+      console.log(`Messages marked as read for ${senderId}`);
     }
   });
 

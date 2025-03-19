@@ -10,7 +10,8 @@ import {
   Search, 
   Users, 
   Heart,
-  Loader
+  Loader,
+  MessageSquare
 } from 'lucide-react';
 
 const UserConnections = () => {
@@ -109,6 +110,21 @@ const UserConnections = () => {
     }
   };
 
+  const handleMessageUser = (userId, event) => {
+    event.stopPropagation();
+    
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+    
+    if (currentUser._id === userId) {
+      return;
+    }
+
+    navigate(`/messages/${userId}`);
+  };
+
   const navigateToProfile = (userId) => {
     navigate(`/user/${userId}`);
   };
@@ -156,37 +172,47 @@ const UserConnections = () => {
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
-                user.name?.charAt(0).toUpperCase() || <UserCircle size={24} />
+                user.name?.charAt(0).toUpperCase() || <UserCircle size={16} />
               )}
             </div>
             <div className="ml-4 flex-1">
               <h3 className="font-medium text-white text-lg">{user.name}</h3>
-              <p className="text-gray-400 text-sm truncate">{user.email}</p>
+         
             </div>
             {currentUser && currentUser._id !== user._id && (
-              <button
-                onClick={(e) => handleFollowToggle(user._id, e)}
-                disabled={followLoading[user._id]}
-                className={`ml-4 p-2 rounded-lg flex items-center ${
-                  isFollowing(user._id)
-                    ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
-                } transition-colors duration-200`}
-              >
-                {followLoading[user._id] ? (
-                  <Loader size={18} className="animate-spin" />
-                ) : isFollowing(user._id) ? (
-                  <>
-                    <UserMinus size={18} className="mr-2" />
-                    <span>Unfollow</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus size={18} className="mr-2" />
-                    <span>Follow</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center">
+                <button
+                  onClick={(e) => handleMessageUser(user._id, e)}
+                  className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 text-white mr-2 transition-all duration-200"
+                  aria-label="Message user"
+                  title="Send message"
+                >
+                  <MessageSquare size={18} />
+                </button>
+                <button
+                  onClick={(e) => handleFollowToggle(user._id, e)}
+                  disabled={followLoading[user._id]}
+                  className={`p-2 rounded-lg flex items-center ${
+                    isFollowing(user._id)
+                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  } transition-colors duration-200`}
+                >
+                  {followLoading[user._id] ? (
+                    <Loader size={18} className="animate-spin" />
+                  ) : isFollowing(user._id) ? (
+                    <>
+                      <UserMinus size={18} className="mr-2" />
+                      <span>Unfollow</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={18} className="mr-2" />
+                      <span>Follow</span>
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </div>
         ))}
