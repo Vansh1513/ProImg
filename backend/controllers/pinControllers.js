@@ -177,21 +177,26 @@ export const deleteComment = TryCatch(async (req, res) => {
   );
 
 
-  export const myLikes = TryCatch(async (req, res) => {
+  export const myLikes = async (req, res) => {
     try {
-      const userId = mongoose.Types.ObjectId(req.user._id); 
-  
-      const pins = await Pin.find({ likes: userId });
-  
-      res.status(200).json({
-        success: true,
-        pins,
-      });
+        const { id } = req.params; 
+
+        if (!id) {
+            return res.status(400).json({ success: false, message: "User ID is required." });
+        }
+
+        const pins = await Pin.find({ likes: id });
+
+        res.status(200).json({
+            success: true,
+            pins,
+        });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
     }
-  });
+};
+
 
 
   

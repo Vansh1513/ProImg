@@ -15,6 +15,6 @@ router.post("/comment/:id",isAuth,commentOnPin);
 router.delete("/comment/:id",isAuth,deleteComment);
 router.post("/like/:id",isAuth,likeAndUnlike);
 router.get("/likes/:id",isAuth,getLikes);
-router.get("/liked",isAuth,myLikes);
+router.get("/liked/:id",isAuth,myLikes);
 
 export default router;
