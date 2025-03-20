@@ -9,11 +9,10 @@ import { LogOut, UserCircle, Grid, Loader } from "lucide-react";
 
 const Account = ({ user }) => {
   const navigate = useNavigate();
-  const { setIsAuth, setUser,fetchUser } = UserData();
+  const { setIsAuth, setUser, fetchUser } = UserData();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { pins, loading } = PinData();
 
-  // Handle logout with loading state
   const logoutHandler = async () => {
     try {
       setIsLoggingOut(true);
@@ -29,19 +28,14 @@ const Account = ({ user }) => {
     }
   };
 
-  // Filter pins safely
   const userPins = pins && user && user._id
     ? pins.filter((pin) => pin.owner === user._id)
     : [];
 
   useEffect(() => {
     fetchUser();
-  
-    
-  }, [])
-  
+  }, []);
 
-  // Handle case where user data isn't available
   if (!user || !user._id) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-6 flex items-center justify-center">
@@ -56,47 +50,38 @@ const Account = ({ user }) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4">
       <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
         <div className="bg-gray-800 rounded-xl shadow-xl p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            {/* Profile Image */}
             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-lg">
               <span className="text-5xl font-bold text-white">
                 {user.name ? user.name.slice(0, 1).toUpperCase() : "?"}
               </span>
             </div>
             
-            {/* Profile Info */}
             <div className="flex-1 text-center md:text-left">
               <h1 className="text-3xl font-bold mb-2">
                 {user.name ? user.name.toUpperCase() : "User"}
               </h1>
               <p className="text-gray-300 mb-4">{user.email}</p>
               
-              {/* Stats */}
               <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-4">
                 <div className="bg-gray-700 rounded-lg px-4 py-2">
                   <p className="text-sm text-gray-400">Pins</p>
                   <p className="text-xl font-bold">{userPins.length}</p>
                 </div>
                 
-                <div className="bg-gray-700 rounded-lg px-4 py-2">
+                <div className="bg-gray-700 rounded-lg px-4 py-2 cursor-pointer" onClick={() => navigate(`/get/${user._id}`)}>
                   <p className="text-sm text-gray-400">Followers</p>
-                  <p className="text-xl font-bold"
-                  onClick={() => navigate(`/get/${user._id}`)}
-                  >{user.followers ? user.followers.length : 0}</p>
+                  <p className="text-xl font-bold">{user.followers ? user.followers.length : 0}</p>
                 </div>
                 
-                <div className="bg-gray-700 rounded-lg px-4 py-2">
+                <div className="bg-gray-700 rounded-lg px-4 py-2 cursor-pointer" onClick={() => navigate(`/get/${user._id}`)}>
                   <p className="text-sm text-gray-400">Following</p>
-                  <p className="text-xl font-bold"
-                  onClick={() => navigate(`/get/${user._id}`)}
-                  >{user.following ? user.following.length : 0}</p>
+                  <p className="text-xl font-bold">{user.following ? user.following.length : 0}</p>
                 </div>
               </div>
               
-              {/* Actions */}
-              <div>
+              <div className="flex gap-4 flex-wrap justify-center md:justify-start">
                 <button
                   onClick={logoutHandler}
                   disabled={isLoggingOut}
@@ -114,12 +99,18 @@ const Account = ({ user }) => {
                     </>
                   )}
                 </button>
+                <button
+                  onClick={() => navigate('/create')}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  <Grid size={18} />
+                  <span>Create Pin</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
         
-        {/* Pins Section */}
         <div>
           <div className="flex items-center mb-6">
             <Grid className="mr-2 text-green-400" />

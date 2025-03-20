@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { PinData } from '../context/PinContext';
 import { GridLoader } from 'react-spinners';
 import PinCard from '../components/PinCard';
+import { ImageIcon } from 'lucide-react';
 
 const Home = () => {
   const { fetchPins, pins, loading } = PinData();
@@ -10,7 +11,6 @@ const Home = () => {
     fetchPins();
   }, []);
 
-  // Loading component
   const Loading = () => (
     <div className="flex flex-col items-center justify-center min-h-[50vh]">
       <GridLoader size={24} className="text-emerald-500 animate-pulse mb-4" />
@@ -18,7 +18,6 @@ const Home = () => {
     </div>
   );
 
-  // Empty state
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
       <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">

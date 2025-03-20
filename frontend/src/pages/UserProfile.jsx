@@ -359,29 +359,7 @@ const UserProfile = ({ user: loggedInUser }) => {
             Pins
           </button>
           
-          <button
-            onClick={() => setActiveTab("likes")}
-            className={`px-6 py-3 font-medium flex items-center transition-colors ${
-              activeTab === "likes" 
-                ? "text-green-400 border-b-2 border-green-400" 
-                : "text-gray-400 hover:text-gray-200"
-            }`}
-          >
-            <Heart size={18} className="mr-2" />
-            Likes
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("saved")}
-            className={`px-6 py-3 font-medium flex items-center transition-colors ${
-              activeTab === "saved" 
-                ? "text-green-400 border-b-2 border-green-400" 
-                : "text-gray-400 hover:text-gray-200"
-            }`}
-          >
-            <BookmarkPlus size={18} className="mr-2" />
-            Saved
-          </button>
+    
         </div>
         
         <div>
