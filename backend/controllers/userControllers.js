@@ -16,7 +16,7 @@ dotenv.config();
 const TEMP_USERS = {}; 
 
 export const registerWithOtp = TryCatch(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email,password  } = req.body;
 
    
    if (Array.isArray(email) || !validator.isEmail(email)) {
